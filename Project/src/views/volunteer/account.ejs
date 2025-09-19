@@ -1,0 +1,127 @@
+<%- include('../partials/header') %>
+
+<%- include('../partials/navbar-dark') %>
+
+<div class="d-flex am-dark" style="height: 95vh;">
+
+    <%- include('../partials/sidebar-dark') %>
+
+    <div class="content w-100 p-4 ngo-dashboard" style="overflow-y: auto;">
+        <div class="w-100 text-white">
+            <div class="mb-4">
+                <h4>Manage Account</h4>
+                <p>Update your profile information and preferences</p>
+            </div>
+            <div class="row g-4">
+                <!-- Left: Personal Information -->
+                <div class="col-lg-8">
+                    <div class="ngo-section p-4 rounded">
+                        <h5 class="text-white mb-4">Personal Information</h5>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="ngo-logo bg-secondary rounded-circle me-3"></div>
+                            <div>
+                                <h6 class="mb-0 text-white">John Smith</h6>
+                                <small class=" ">Volunteer</small>
+                            </div>
+                        </div>
+    
+                        <!-- Change Photo Button (Hidden by default) -->
+                        <button id="changePhotoBtn" class="btn btn-primary mb-4 d-none">Change Photo</button>
+    
+                        <!-- Form -->
+                        <form id="profileForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label  ">Full Name</label>
+                                    <input type="text" class="form-control bg-dark text-white border-0 p-3" value="John Smith"
+                                        disabled>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label  ">Email</label>
+                                    <input type="email" class="form-control bg-dark text-white border-0 p-3"
+                                        value="john.smith@email.com" disabled>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label  ">Phone</label>
+                                    <input type="text" class="form-control bg-dark text-white border-0 p-3"
+                                        value="+1 (555) 123-4567" disabled>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label  ">Location</label>
+                                    <input type="text" class="form-control bg-dark text-white border-0 p-3" value="New York, NY"
+                                        disabled>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label  ">Bio</label>
+                                    <textarea class="form-control bg-dark text-white border-0 p-3" rows="3" disabled>
+    Passionate volunteer with 2+ years of experience in food distribution and community service. Always ready to help those in need.
+                    </textarea>
+                                </div>
+                            </div>
+    
+                            <!-- Action Buttons -->
+                            <div class="mt-4">
+                                <button type="button" id="editProfileBtn" class="btn btn-primary">Edit Profile</button>
+                                <button type="submit" id="updateProfileBtn" class="btn btn-primary d-none">Update
+                                    Profile</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+    
+                <!-- Right Side -->
+                <div class="col-lg-4">
+                    <!-- Volunteer Stats -->
+                    <div class="ngo-section p-4 rounded mb-4">
+                        <h5 class="text-white mb-3">Volunteer Stats</h5>
+                        <p class="  mb-2"><i class="bi bi-calendar-event me-2"></i>Member Since: Jan 2022</p>
+                        <p class="  mb-2">Total Deliveries: <strong>24</strong></p>
+                        <p class="  mb-2">NGOs Joined: <strong>3</strong></p>
+                        <!-- <p class="  mb-0">Average Rating: <i class="bi bi-star-fill text-warning"></i>
+                            <strong>4.8</strong></p> -->
+                    </div>
+    
+                    <!-- Account Settings -->
+                    <div class="ngo-section p-4 rounded">
+                        <h5 class="text-white mb-3">Account Settings</h5>
+                        <button class="btn btn-dark w-100 mb-2">Change Password</button>
+                        <!-- <button class="btn btn-dark w-100 mb-2">Notification Settings</button> -->
+                        <button class="btn btn-dark w-100 mb-2">Availibility Settings</button>
+                        <button class="btn btn-danger w-100">Delete Account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editBtn = document.getElementById("editProfileBtn");
+        const updateBtn = document.getElementById("updateProfileBtn");
+        const changePhotoBtn = document.getElementById("changePhotoBtn");
+        const inputs = document.querySelectorAll("#profileForm input, #profileForm textarea");
+
+        // Toggle edit mode
+        editBtn.addEventListener("click", function () {
+            inputs.forEach(input => input.disabled = false);
+            editBtn.classList.add("d-none");
+            updateBtn.classList.remove("d-none");
+            changePhotoBtn.classList.remove("d-none");
+        });
+
+        // Submit updated profile
+        document.getElementById("profileForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            inputs.forEach(input => input.disabled = true);
+            updateBtn.classList.add("d-none");
+            changePhotoBtn.classList.add("d-none");
+            editBtn.classList.remove("d-none");
+            alert("Profile updated successfully!");
+        });
+    });
+</script>
+
+
+<%- include('../partials/footer') %>

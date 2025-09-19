@@ -1,0 +1,80 @@
+<%- include('../partials/header') %>
+
+<%- include('../partials/navbar-dark') %>
+
+<div class="d-flex am-dark" style="height: 95vh;">
+
+    <%- include('../partials/sidebar-dark') %>
+
+        <div class="content w-100 p-4 ngo-dashboard" style="overflow-y: auto;">
+            <div class="w-100 text-white">
+                <div class="mb-4">
+                    <h4>Notifications</h4>
+                    <p>Stay updated with your volunteer activities</p>
+                </div>
+                <!-- Notifications Section -->
+                <div class="mb-5 p-4 rounded notifications-wrapper"
+                    style="background-color: var(--am-darktheme-light);">
+                    <div class="d-flex justify-content-between align-items-center border-bottom border-secondary mb-4"
+                        style="color: var(--am-darktheme-font);">
+                        <h3>Notifications</h3>
+                        <a href="#" class="text-decoration-none" style="color: var(--am-darktheme-font);">Mark all as
+                            Read</a>
+                    </div>
+
+                    <!-- Notification Item -->
+                    <div class="notification-item d-flex justify-content-between align-items-start p-3 rounded mb-3">
+                        <div class="d-flex">
+                            <i class="bi bi-check-circle-fill text-success me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-1 fw-semibold text-white">Join Request Approved</h6>
+                                <p class="mb-1">Your request to join Helping Hands NGO has been approved.
+                                    Welcome to the team!</p>
+                                <small class="text-secondary">1 day ago</small>
+                            </div>
+                        </div>
+                        <a href="#" class="text-decoration-none text-white small">Mark as Read</a>
+                    </div>
+
+                    <div class="notification-item d-flex justify-content-between align-items-start p-3 rounded mb-3">
+                        <div class="d-flex">
+                            <i class="bi bi-x-circle-fill text-danger me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-1 fw-semibold text-white">Join Request Declined</h6>
+                                <p class="mb-1">Unfortunately, your request to join Care Foundation has been
+                                    declined due to capacity limits.</p>
+                                <small class="text-secondary">2 days ago</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="notification-item d-flex justify-content-between align-items-start p-3 rounded mb-3">
+                        <div class="d-flex">
+                            <i class="bi bi-bell text-info me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-1 fw-semibold text-white">Assignment Reminder</h6>
+                                <p class="mb-1  ">Reminder: You have a pickup scheduled tomorrow at 10:00 AM
+                                    from Local Bakery.</p>
+                                <small class="text-secondary">3 days ago</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="notification-item d-flex justify-content-between align-items-start p-3 rounded">
+                        <div class="d-flex">
+                            <i class="bi bi-bell text-info me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-1 fw-semibold text-white">Delivery Feedback Received</h6>
+                                <p class="mb-1  ">Community Kitchen has rated your delivery service 5 stars.
+                                    Great job!</p>
+                                <small class="text-secondary">5 days ago</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,763 @@
+below is a filters row in the main body content which contains some filter options to filter the donations from mongo db,
+also it has some spans that shows the currently applied active filters, and there is one more button more filters, which opens the right side panel that provides more filters:
+<div class="card-body p-4">
+    <div class="d-flex flex-wrap gap-2">
+        <div class="flex-grow-1">
+            <div class="d-flex">
+                <div class="border rounded d-flex align-items-center pe-2 w-100" style="padding: 0.375rem 0;">
+                    <i class="fas fa-search text-secondary" style="height: fit-content; margin: 0 0.75rem;"></i>
+                    <input type="text" class="w-100 p-0" placeholder="Search donations..." style="border: none; outline: none; color: var(--bs-body-color);" fdprocessedid="3w7ir">
+                </div>
+            </div>
+        </div>
+        <div class="">
+            <!-- more filters button -->
+            <button class="btn btn-hover-secondary-subtle border w-100 align-middle" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas" aria-controls="filtersOffcanvas" fdprocessedid="opz5m9">
+                <i class="fas fa-sliders-h text-secondary me-1"></i> More Filters
+            </button>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <span class="text-secondary" style="width: fit-content;">Active filters:</span>
+        <span class="badge bg-secondary text-dark mx-1 mb-2">
+            Status:pending <i class="bi bi-x"></i>
+        </span>
+        <span class="badge bg-secondary text-dark mx-1 mb-2">
+            Status:pending <i class="bi bi-x"></i>
+        </span>
+        <span class="badge bg-secondary text-dark mx-1 mb-2">
+            Status:pending <i class="bi bi-x"></i>
+        </span>
+        <span class="badge bg-secondary text-dark mx-1 mb-2">
+            Status:pending <i class="bi bi-x"></i>
+        </span>
+        <span class="clear-all" style="height: fit-content;">
+            Clear All
+        </span>
+    </div>
+</div>
+
+this is the html structure of more filters sidebar that opens from right side:
+
+<!-- right sidebar for more search filters -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="filtersOffcanvas" aria-labelledby="filtersOffcanvasLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="filtersOffcanvasLabel">Advance filters</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <!-- food type filters -->
+        <div class="mb-4">
+            <label class="form-label"><strong>Food Type</strong></label>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Cooked Food" id="food1">
+                <label class="form-check-label" for="food1">Cooked Food</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Raw Food" id="food2">
+                <label class="form-check-label" for="food2">Raw Food</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Packaged Food" id="food3">
+                <label class="form-check-label" for="food3">Packaged Food</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Fruits & Vegetables" id="food4">
+                <label class="form-check-label" for="food4">Fruits & Vegetables</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Spices & Condiments" id="food5">
+                <label class="form-check-label" for="food5">Spices & Condiments</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Canned or Tinned Food" id="food6">
+                <label class="form-check-label" for="food6">Canned or Tinned Food</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Bakery Products" id="food7">
+                <label class="form-check-label" for="food7">Bakery Products</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Dairy Products" id="food8">
+                <label class="form-check-label" for="food8">Dairy Products</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Beverages" id="food9">
+                <label class="form-check-label" for="food9">Beverages</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Nutritional Supplements" id="food10">
+                <label class="form-check-label" for="food10">Nutritional Supplements</label>
+            </div>
+        </div>
+        <!-- food condition filters -->
+        <div class="mb-4">
+            <label class="form-label"><strong>Select specific donors</strong></label>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Hunger Restaurant" id="condition1">
+                <label class="form-check-label" for="condition1">Hunger Restaurant</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Hanumant Restaurant" id="condition2">
+                <label class="form-check-label" for="condition2">Hanumant Restaurant</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="TrueNation Restaurant" id="condition3">
+                <label class="form-check-label" for="condition3">TrueNation Restaurant</label>
+            </div>
+            <div class="mb-2">
+                <label class="form-label"><strong>Search for Donors:</strong></label>
+                <input type="text" class="form-control" id="searchDonor" placeholder="Donor name">
+            </div>
+        </div>
+        <!-- food source filters -->
+        <div class="mb-4">
+            <label class="form-label"><strong>Food Source</strong></label>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Restaurant" id="source1">
+                <label class="form-check-label" for="source1">Restaurant</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Event" id="source2">
+                <label class="form-check-label" for="source2">Event</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Home" id="source3">
+                <label class="form-check-label" for="source3">Home</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Caterer" id="source4">
+                <label class="form-check-label" for="source4">Caterer</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Supermarket" id="source5">
+                <label class="form-check-label" for="source5">Supermarket</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Bakery" id="source6">
+                <label class="form-check-label" for="source6">Bakery</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Corporate" id="source7">
+                <label class="form-check-label" for="source7">Corporate</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Religious Place" id="source8">
+                <label class="form-check-label" for="source8">Religious Place</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Hostel" id="source9">
+                <label class="form-check-label" for="source9">Hostel</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Canteen" id="source10">
+                <label class="form-check-label" for="source10">Canteen</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="NGO" id="source11">
+                <label class="form-check-label" for="source11">NGO</label>
+            </div>
+        </div>
+        <!-- expiry date filter-->
+        <div class="mb-4">
+            <label class="form-label"><strong>Last Expiry Date</strong></label>
+            <input type="date" class="form-control" id="expiryDate" placeholder="Select Expiry Date">
+        </div>
+        <!-- cooked date filter-->
+        <div class="mb-4">
+            <label class="form-label"><strong>Last Cooked Date</strong></label>
+            <input type="date" class="form-control" id="cookedDate" placeholder="Select Cooked Date">
+        </div>
+        <!-- possible number of people fed filter -->
+        <div class="mb-4">
+            <label class="form-label"><strong>Number of People Fed</strong></label>
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label"><strong>Minimum</strong></label>
+                    <input type="number" class="form-control" id="minPeopleFed" placeholder="Min People Fed">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label"><strong>Maximum</strong></label>
+                    <input type="number" class="form-control" id="maxPeopleFed" placeholder="Max People Fed">
+                </div>
+            </div>
+        </div>
+        <!-- specific donors filter -->
+        <div class="mb-4">
+            <label class="form-label"><strong>Select specific donors</strong></label>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Hunger Restaurant" id="condition1">
+                <label class="form-check-label" for="condition1">Hunger Restaurant</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="Hanumant Restaurant" id="condition2">
+                <label class="form-check-label" for="condition2">Hanumant Restaurant</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="TrueNation Restaurant" id="condition3">
+                <label class="form-check-label" for="condition3">TrueNation Restaurant</label>
+            </div>
+            <div class="mb-2">
+                <label class="form-label"><strong>Search for NGO:</strong></label>
+                <input type="text" class="form-control" id="searchNGO" placeholder="NGO name">
+            </div>
+        </div>
+        <!-- state filter -->
+        <div class="mb-4">
+            <label class="form-label"><strong>State</strong></label>
+            <select class="form-select" id="stateFilter">
+                <option value="" selected disabled>Select State</option>
+                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                <option value="Assam">Assam</option>
+                <option value="Bihar">Bihar</option>
+                <option value="Chhattisgarh">Chhattisgarh</option>
+                <option value="Goa">Goa</option>
+                <option value="Gujarat">Gujarat</option>
+                <option value="Haryana">Haryana</option>
+                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                <option value="Jharkhand">Jharkhand</option>
+                <option value="Karnataka">Karnataka</option>
+                <option value="Kerala">Kerala</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                <option value="Maharashtra">Maharashtra</option>
+                <option value="Manipur">Manipur</option>
+                <option value="Meghalaya">Meghalaya</option>
+                <option value="Mizoram">Mizoram</option>
+                <option value="Nagaland">Nagaland</option>
+                <option value="Odisha">Odisha</option>
+                <option value="Punjab">Punjab</option>
+                <option value="Rajasthan">Rajasthan</option>
+                <option value="Sikkim">Sikkim</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="Telangana">Telangana</option>
+                <option value="Tripura">Tripura</option>
+                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                <option value="Uttarakhand">Uttarakhand</option>
+                <option value="West Bengal">West Bengal</option>
+                <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                <option value="Chandigarh">Chandigarh</option>
+                <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu
+                </option>
+                <option value="Lakshadweep">Lakshadweep</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Puducherry">Puducherry</option>
+                <option value="Ladakh">Ladakh</option>
+                <option value="Lakshadweep">Lakshadweep</option>
+            </select>
+
+        </div>
+        <!-- city filter -->
+        <div class="mb-4">
+            <label class="form-label"><strong>City</strong></label>
+            <select class="form-select" id="cityFilter">
+                <option value="" selected disabled>Select City</option>
+                <option value="Mumbai">Mumbai</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Bangalore">Bangalore</option>
+                <option value="Chennai">Chennai</option>
+                <option value="Kolkata">Kolkata</option>
+                <option value="Hyderabad">Hyderabad</option>
+                <option value="Ahmedabad">Ahmedabad</option>
+                <option value="Pune">Pune</option>
+                <option value="Jaipur">Jaipur</option>
+                <option value="Lucknow">Lucknow</option>
+            </select>
+        </div>
+        <!-- pincode number filter -->
+        <div class="mb-4">
+            <label class="form-label"><strong>Pincode</strong></label>
+            <input type="text" class="form-control" id="pincodeFilter" placeholder="Enter Pincode">
+        </div>
+    </div>
+</div>
+
+and below is my donation model for mongodb.
+
+const mongoose = require('mongoose');
+
+// Define enums
+const foodSourceOptions = [
+    "Restaurant", "Event", "Home", "Caterer", "Supermarket", "Bakery", "Corporate",
+    "Religious Place", "Hostel", "Canteen", "NGO", "Other"
+];
+
+const donationStatusOptions = [
+    "New", "Assigned", "Scheduled", "Picked", "Completed", "Failed"
+];
+
+const quantityUnitOptions = [
+    "Kilograms", "Grams", "Liters", "Milliliters", "Pieces", "Packets", "Boxes", "Cans", "Bottles", "Other"
+];
+
+const foodTypeOptions = [
+    "Cooked Food", "Raw Food", "Packaged Food", "Fruits & Vegetables", "Spices & Condiments",
+    "Canned or Tinned Food", "Bakery Products", "Dairy Products",
+    "Beverages", "Nutritional Supplements", "Other"
+];
+
+const foodConditionOptions = [
+    "Fresh", "Leftover", "Near Expiry", "Preserved", "Slightly Used", "Other"
+];
+
+// Food Item sub-schema
+const foodItemSchema = new mongoose.Schema({
+    name: { type: String, required: true, trim: true },
+    quantity: { type: Number, required: true, min: 1 },
+    unit: { type: String, enum: quantityUnitOptions, required: true },
+    type: { type: String, enum: foodTypeOptions, required: true },
+    condition: { type: String, enum: foodConditionOptions, required: true },
+    expiryDate: { type: Date },
+    expiryTime: { type: String },
+    cookedDate: { type: Date, required: true },
+    cookedTime: { type: String, required: true },
+    itemImages: {
+        type: [String],
+        required: true,
+        validate: {
+            validator: v => Array.isArray(v) && v.length > 0 && v.length <= 3,
+            message: 'Food item must have between 1 and 3 images.'
+        }
+    } // array of image URLs or paths
+});
+
+// Main Donation schema
+const donationSchema = new mongoose.Schema({
+    donorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+
+    title: { type: String, required: true, trim: true },
+
+    source: { type: String, enum: foodSourceOptions, required: true },
+
+    items: {
+        type: [foodItemSchema],
+        required: true,
+        validate: {
+            validator: v => Array.isArray(v) && v.length > 0,
+            message: 'Minimum one food item is required.'
+        }
+    },
+
+    numberOfPeopleFed: { type: Number, required: true, min: 1 },
+
+    description: { type: String, trim: true },
+
+    images: {
+        type: [String],
+        required: true,
+        validate: {
+            validator: v => Array.isArray(v) && v.length > 0 && v.length <= 5,
+            message: 'Food donation must have between 1 and 5 images.'
+        }
+    }, // general images for the donation
+
+    status: {
+        type: String,
+        enum: donationStatusOptions,
+        default: 'New'
+    },
+
+    address: { type: String, required: true, maxlength: 300 },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    pincode: {
+        type: String,
+        required: true,
+        match: [/^\d{6}$/, 'Please enter a valid 6-digit pincode']
+    },
+
+    location: {
+        longitude: { type: Number, required: true },
+        latitude: { type: Number, required: true }
+    },
+
+    contact: {
+        type: String,
+        required: true,
+        match: [/^\d{10}$/, 'Contact number must be 10 digits']
+    },
+
+    email: {
+        type: String,
+        required: true,
+        lowercase: true,
+        match: [/.+@.+\..+/, 'Please enter a valid email address']
+    },
+
+    personName: { type: String, required: true },
+
+    assignedNgoId: { type: mongoose.Schema.Types.ObjectId, ref: 'NGO', default: null }
+}, {
+    timestamps: true // adds createdAt and updatedAt
+});
+
+const Donation = mongoose.model('Donation', donationSchema);
+
+module.exports = Donation;
+
+
+----------------------------------------------------
+
+now first understand that which type of filters functionality i want for donations:
+in the filters row, there is one input box which i want to use to search for donations with specific title, or description that contains the search value.
+in more/advance filters,
+1st there are checkboxes for the food type, for this i want to provide donations results in which any of the donations's food item's type matches with any of selected checkboxes.
+2nd there are checkboxes for the food condition, for this i want to provide donations results in which any of the donations's food item's condition matches with any of selected checkboxes.
+3rd there are checkboxes for the food source, for this i want to provide donations results in which any of the donations's source matches with any of selected checkboxes.
+4th there is a last expiry date selector, for which i want to list donation results in which any of the donation's food items expiring after that date.
+5th there is a last cooked date selector, for which i want to list donation results in which any of the donation's food items cooked after that date.
+6th there is a filter for number of people fed which has two inputs for Minimum and Maximum, for which i want to list donations of which numberOfPeopleFed is between those values. if only min is provided then look for Minimum, if only max is provided then look for only max and if nothing is provided then don't filter based on numberOfPeopleFed.
+7th there are checkboxes for the specific donors, for this i want to provide donations results which are donated by the selected checkboxes of donors. and if user wants to search donations donated by specific donor and not available in checkboxes for donors then he can search for donors and select it in the search suggetions below the search box and a check box for that specific donor will be added and selected.
+after that there are two select inputs for state and city to show donations which are in the selected state and city.
+and after that one input box for pincode, to show donations with that pincode. validate for valid pincode which is based on it's length i guess and then search donations with that pincode.
+and if none of the checkboxes or any of the filters from above all are selected/applied then i want to show all donations.
+
+
+so above are the filters i want to apply now first i want you to provide me js code to manipulate these filters and display currently applied filters in the filters row in which there are some dummy examples are added which shows dummy appied filters. also each appied filter option contains cross by clicking on which that filter is removed and it's update should be applied in the more filters also in the main body content. 
+so provide me js code to do that and also you can do any changes in the sidebar of more filters and row of filters in main body content if required to perform the logic.
+
+so provide me valid js and html code saperately.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===============================================================================================================
+
+
+ok so below is users data with Donor role which contains the ids of the users also:
+
+[
+{
+"_id": "689f2efb48fd1c6763401a3d",
+"firstName": "Helping",
+"lastName": "Hands",
+"email": "contact@helpinghands.org",
+"contact": "9811112233",
+"role": "NGO",
+"address": "12 MG Road, Bengaluru, Karnataka",
+"passwordHash": "$2b$10$UE9bc8seshPuXxJLQYF56eTZK/aYt.7FKc7RHReGI7/VfhL.uaNNe",
+"createdAt": "2025-08-15T12:58:35.515Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a3e",
+"firstName": "Food",
+"lastName": "ForAll",
+"email": "info@foodforall.org",
+"contact": "9822223344",
+"role": "NGO",
+"address": "88 Park Street, Kolkata, West Bengal",
+"passwordHash": "$2b$10$0BvJ71kYVnaHHQU7wRUcZOwxkI.O.WjXdR.kOZS/i9BIXiMLf4i4S",
+"createdAt": "2025-08-15T12:58:35.518Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a3f",
+"firstName": "Care",
+"lastName": "Trust",
+"email": "support@caretrust.org",
+"contact": "9833334455",
+"role": "NGO",
+"address": "56 Anna Salai, Chennai, Tamil Nadu",
+"passwordHash": "$2b$10$wnmYbZ5n/hiLF97cFOxZjeJvyIc2g4YVsFCtEpI4wSpT/3anjlqta",
+"createdAt": "2025-08-15T12:58:35.519Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a40",
+"firstName": "Green",
+"lastName": "Hope",
+"email": "hello@greenhope.org",
+"contact": "9844445566",
+"role": "NGO",
+"address": "22 Ashram Road, Ahmedabad, Gujarat",
+"passwordHash": "$2b$10$RuHR2.FFcfX9zlS32SFqd.9Vikb3bY0PBZDWiSqru0sdP1a8I5jIm",
+"createdAt": "2025-08-15T12:58:35.519Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a41",
+"firstName": "Smile",
+"lastName": "Foundation",
+"email": "contact@smilefoundation.org",
+"contact": "9855556677",
+"role": "NGO",
+"address": "15 Connaught Place, New Delhi",
+"passwordHash": "$2b$10$7GBklBwBpoEgeZ9qzWHabubulWIOGp6rBDO8.3KHRvy9siqnQObci",
+"createdAt": "2025-08-15T12:58:35.520Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a42",
+"firstName": "Bright",
+"lastName": "Future",
+"email": "team@brightfuture.org",
+"contact": "9866667788",
+"role": "NGO",
+"address": "34 Jubilee Hills, Hyderabad, Telangana",
+"passwordHash": "$2b$10$NKs3/5gGjXJiYWwoQT6ayemGFIQGYDsJ.dvUkbQ88g/DuDDw/UFIy",
+"createdAt": "2025-08-15T12:58:35.520Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a43",
+"firstName": "Seva",
+"lastName": "Trust",
+"email": "info@sevatrust.org",
+"contact": "9877778899",
+"role": "NGO",
+"address": "78 MG Marg, Thiruvananthapuram, Kerala",
+"passwordHash": "$2b$10$eFwabD0kqzQDu6w7xnGmoOhAI9n5OgT1JRxe1h1bGvlvcdOK1OsGe",
+"createdAt": "2025-08-15T12:58:35.520Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a44",
+"firstName": "Hope",
+"lastName": "Charity",
+"email": "contact@hopecharity.org",
+"contact": "9888889900",
+"role": "NGO",
+"address": "90 Civil Lines, Jaipur, Rajasthan",
+"passwordHash": "$2b$10$ES3ppm6bLKzgnkExwfgMNOw86My7l.60F7AO.0VYhB7VR3VU04JZS",
+"createdAt": "2025-08-15T12:58:35.521Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a45",
+"firstName": "Food",
+"lastName": "Relief",
+"email": "relief@foodrelief.org",
+"contact": "9899990011",
+"role": "NGO",
+"address": "5 Salt Lake, Kolkata, West Bengal",
+"passwordHash": "$2b$10$h/FJ6nW7vG2uYkSfUylyz.MbLYku4L94/S0Y61fq7RQDz1pFh.7cm",
+"createdAt": "2025-08-15T12:58:35.521Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a46",
+"firstName": "Serve",
+"lastName": "Nation",
+"email": "team@servenation.org",
+"contact": "9800001122",
+"role": "NGO",
+"address": "11 Park Street, Pune, Maharashtra",
+"passwordHash": "$2b$10$DewqFA1Bhkr9tqTALL6PROzV2gJASJ6GBAqoU6MPYJEAR/EWEx5e2",
+"createdAt": "2025-08-15T12:58:35.521Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a47",
+"firstName": "Helping",
+"lastName": "Hearts",
+"email": "help@helpinghearts.org",
+"contact": "9810101234",
+"role": "NGO",
+"address": "50 MG Road, Indore, Madhya Pradesh",
+"passwordHash": "$2b$10$shwwi3gTiXriGP0G1l/GdufvdCjcmraK1NisPi9IBMahm6PKtQNw6",
+"createdAt": "2025-08-15T12:58:35.522Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a48",
+"firstName": "Food",
+"lastName": "Smile",
+"email": "info@foodsmile.org",
+"contact": "9820202345",
+"role": "NGO",
+"address": "99 Nehru Place, New Delhi",
+"passwordHash": "$2b$10$sPlqSBaX9byo7TjAWw7GzONfxVHP83o5ALWCtkCLhURbSU8sEiBJO",
+"createdAt": "2025-08-15T12:58:35.522Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a49",
+"firstName": "Life",
+"lastName": "Saver",
+"email": "lifesaver@ngo.org",
+"contact": "9830303456",
+"role": "NGO",
+"address": "24 Baner Road, Pune, Maharashtra",
+"passwordHash": "$2b$10$GjBvbP2rC2hN0Akoi9p5b.pkhpkw8dT2NI3hGZBcumHfB9TVqlQnG",
+"createdAt": "2025-08-15T12:58:35.522Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a4a",
+"firstName": "Annapurna",
+"lastName": "Trust",
+"email": "info@annapurnatrust.org",
+"contact": "9840404567",
+"role": "NGO",
+"address": "16 Residency Road, Mumbai, Maharashtra",
+"passwordHash": "$2b$10$N0MDAn41H9zSA2HD0gOWkeV6p6YIqRLRZqpdzHXHEB43YlmP8Qlru",
+"createdAt": "2025-08-15T12:58:35.522Z",
+"__v": 0
+},
+{
+"_id": "689f2efb48fd1c6763401a4b",
+"firstName": "Hunger",
+"lastName": "Free",
+"email": "team@hungerfree.org",
+"contact": "9850505678",
+"role": "NGO",
+"address": "7 Sector 17, Chandigarh",
+"passwordHash": "$2b$10$sqUScnUkNJGP4WthXvfqpenhTU9cz0cjC3v5bKhme3RO8/dtrXdWO",
+"createdAt": "2025-08-15T12:58:35.523Z",
+"__v": 0
+}
+]
+
+
+now below is my schema/model of donation for my project.:
+
+const mongoose = require('mongoose');
+
+// Define enums
+const foodSourceOptions = [
+    "Restaurant", "Event", "Home", "Caterer", "Supermarket", "Bakery", "Corporate",
+    "Religious Place", "Hostel", "Canteen", "NGO", "Other"
+];
+
+const donationStatusOptions = [
+    "New", "Assigned", "Scheduled", "Picked", "Completed", "Failed"
+];
+
+const quantityUnitOptions = [
+    "Kilograms", "Grams", "Liters", "Milliliters", "Pieces", "Packets", "Boxes", "Cans", "Bottles", "Other"
+];
+
+const foodTypeOptions = [
+    "Cooked Food", "Raw Food", "Packaged Food", "Fruits & Vegetables", "Spices & Condiments",
+    "Canned or Tinned Food", "Bakery Products", "Dairy Products",
+    "Beverages", "Nutritional Supplements", "Other"
+];
+
+const foodConditionOptions = [
+    "Fresh", "Leftover", "Near Expiry", "Preserved", "Slightly Used", "Other"
+];
+
+// Food Item sub-schema
+const foodItemSchema = new mongoose.Schema({
+    name: { type: String, required: true, trim: true },
+    quantity: { type: Number, required: true, min: 1 },
+    unit: { type: String, enum: quantityUnitOptions, required: true },
+    type: { type: String, enum: foodTypeOptions, required: true },
+    condition: { type: String, enum: foodConditionOptions, required: true },
+    expiryDate: { type: Date },
+    expiryTime: { type: String },
+    cookedDate: { type: Date, required: true },
+    cookedTime: { type: String, required: true },
+    itemImages: {
+        type: [String],
+        required: true,
+        validate: {
+            validator: v => Array.isArray(v) && v.length > 0 && v.length <= 3,
+            message: 'Food item must have between 1 and 3 images.'
+        }
+    } // array of image URLs or paths
+});
+
+// Main Donation schema
+const donationSchema = new mongoose.Schema({
+    donorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+
+    title: { type: String, required: true, trim: true },
+
+    source: { type: String, enum: foodSourceOptions, required: true },
+
+    items: {
+        type: [foodItemSchema],
+        required: true,
+        validate: {
+            validator: v => Array.isArray(v) && v.length > 0,
+            message: 'Minimum one food item is required.'
+        }
+    },
+
+    numberOfPeopleFed: { type: Number, required: true, min: 1 },
+
+    description: { type: String, trim: true },
+
+    images: {
+        type: [String],
+        required: true,
+        validate: {
+            validator: v => Array.isArray(v) && v.length > 0 && v.length <= 5,
+            message: 'Food donation must have between 1 and 5 images.'
+        }
+    }, // general images for the donation
+
+    status: {
+        type: String,
+        enum: donationStatusOptions,
+        default: 'New'
+    },
+
+    address: { type: String, required: true, maxlength: 300 },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    pincode: {
+        type: String,
+        required: true,
+        match: [/^\d{6}$/, 'Please enter a valid 6-digit pincode']
+    },
+
+    location: {
+        longitude: { type: Number, required: true },
+        latitude: { type: Number, required: true }
+    },
+
+    contact: {
+        type: String,
+        required: true,
+        match: [/^\d{10}$/, 'Contact number must be 10 digits']
+    },
+
+    email: {
+        type: String,
+        required: true,
+        lowercase: true,
+        match: [/.+@.+\..+/, 'Please enter a valid email address']
+    },
+
+    personName: { type: String, required: true },
+
+    assignedNgoId: { type: mongoose.Schema.Types.ObjectId, ref: 'NGO', default: null }
+}, {
+    timestamps: true // adds createdAt and updatedAt
+});
+
+const Donation = mongoose.model('Donation', donationSchema);
+
+module.exports = Donation;
+
+
+once please read through the above data properly without missing a single line or word.
+now i want to insert some donation data to see if my project is working correctly or not. so provide me code like above to create some realistic donations. keep in mind that:
+-for each donation provide items related to title and description ranging from 3 to 10 randomly for each donation and there's also a model for food item provided in above model code i provided you above so follow it also. 
+-above i provide you Donor users data of 15 so please provide me 4 donations data for each Donor user and use Donor's id as donorId in donation record. (so total 60 donations will be there).
+-each food item inside a single donation can have 1 to 3 images and provide those images which are related and meaningful to that food item. 
+-and a single donation can have 1 to 5 images and provide those images which are related and meaningful to that donation.
+-and for all 60 donations please provide all images urls like /images/donations/__image_name__ that you are providing and also provide all those images in either zip file or in any way so that i can use those images in my project. 
+-for each donation provide different and unique and meaningful title and description.
+-for some of the fields i setted enumerable values so please follow those values only.
+-status of donation should be New for all donations.
+-for address, city, state and pincode provide realistic values.
+in short there will be 60 donations possible which you have to provide according to above guidelines and all donations including it's food items should be realistic and meaningful

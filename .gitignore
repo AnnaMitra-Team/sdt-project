@@ -1,0 +1,9 @@
+# Dependencies
+/Project/node_modules/
+
+# Static files
+/Project/public/documents/
+/Project/public/images/
+
+# Environment variables
+/Project/.env

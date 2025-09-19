@@ -1,0 +1,426 @@
+<%- include('../partials/header') %>
+
+<%- include('../partials/navbar-dark') %>
+
+<div class="d-flex am-dark" style="height: 95vh;">
+    <%- include('../partials/sidebar-dark'); %>
+    
+    <div class="content w-100 p-4 ngo-dashboard" style="overflow-y: auto;">
+        <div class="w-100 text-white">
+            <div class="mb-4">
+                <h4>Dashboard</h4>
+                <p>Welcome back, Hardip</p>
+            </div>
+            <div class="py-2">
+                <div class="row justify-content-around" id="statCardsRow">
+                    <!-- <div class="row"> -->
+                    <div class="col-md-6 d-flex justify-content-around">
+                        <div class="card text-center mb-4">
+                            <div class="my-4">
+                                <h2>53</h2>
+                                <p class="mb-0 text-white">Available Donations</p>
+                            </div>
+                        </div>
+                        <div class="card text-center mb-4">
+                            <div class="my-4">
+                                <h2>3</h2>
+                                <p class="mb-0 text-white">Active Donations</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex justify-content-around">
+                        <div class="card text-center mb-4">
+                            <div class="my-4">
+                                <h2>27</h2>
+                                <p class="mb-0 text-white">Complated Donations</p>
+                            </div>
+                        </div>
+                        <div class="card text-center mb-4">
+                            <div class="my-4">
+                                <h2>18</h2>
+                                <p class="mb-0 text-white">Total Volunteers</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- </div> -->
+                </div>
+            </div>
+            <!-- Active Donations -->
+            <div class="mb-5 p-4 rounded" style="background-color: var(--am-darktheme-light);">
+                <div class="d-flex justify-content-between align-items-center border-bottom border-secondary mb-4"
+                    style="color: var(--am-darktheme-font);">
+                    <h3>Active Donations</h3>
+                    <a href="" style="text-decoration: none; color: var(--am-darktheme-font);">
+                        <h5>View all</h5>
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <div class="d-flex g-4 active-donation-cards text-white">
+                        <div class="me-4" style="min-width: 350px;">
+                            <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&amp;h=200&amp;fit=crop"
+                                    class="card-img-top" alt="Fresh Vegetables and Fruits">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title fw-semibold text-truncate-1 mb-0">Fresh Vegetables and
+                                            Fruits</h5>
+                                        <span class="badge-status badge-pending">Pending</span>
+                                    </div>
+                                    <p class="mb-3">Local Restaurant</p>
+                                    <ul class="list-unstyled mb-4">
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-geo-alt text-secondary me-2"></i>
+                                            <span class="text-truncate-1">123 Main St, Downtown, Mumbai</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-telephone text-secondary me-2"></i>
+                                            <span>+91 9876543210</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-box-seam text-secondary me-2"></i>
+                                            <span>5 items</span>
+                                        </li>
+                                        <li class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-event text-secondary me-2"></i>
+                                            <span>Expires: 6/15/2024</span>
+                                        </li>
+                                    </ul>
+                                    <div class="d-flex gap-2 mt-auto">
+                                        <button class="btn btn-view flex-fill">Edit</button>
+                                        <button class="btn btn-delete flex-fill">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="me-4" style="min-width: 350px;">
+                            <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=300&amp;h=200&amp;fit=crop"
+                                    class="card-img-top" alt="Cooked Rice and Dal">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title fw-semibold text-truncate-1 mb-0">Cooked Rice and Dal
+                                        </h5>
+                                        <span class="badge-status badge-pending">Pending</span>
+                                    </div>
+                                    <p class="mb-3">Community Kitchen</p>
+                                    <ul class="list-unstyled mb-4">
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-geo-alt text-secondary me-2"></i>
+                                            <span class="text-truncate-1">456 Park Ave, Central, Delhi</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-telephone text-secondary me-2"></i>
+                                            <span>+91 9876543211</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-box-seam text-secondary me-2"></i>
+                                            <span>3 items</span>
+                                        </li>
+                                        <li class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-event text-secondary me-2"></i>
+                                            <span>Expires: 6/13/2024</span>
+                                        </li>
+                                    </ul>
+                                    <div class="d-flex gap-2 mt-auto">
+                                        <button class="btn btn-view flex-fill">View</button>
+                                        <button class="btn btn-delete flex-fill">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="me-4" style="min-width: 350px;">
+                            <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1472396961693-142e6e269027?w=300&amp;h=200&amp;fit=crop"
+                                    class="card-img-top" alt="Packaged Snacks">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title fw-semibold text-truncate-1 mb-0">Packaged Snacks</h5>
+                                        <span class="badge-status badge-picked">Picked</span>
+                                    </div>
+                                    <p class="mb-3">Corporate Event</p>
+                                    <ul class="list-unstyled mb-4">
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-geo-alt text-secondary me-2"></i>
+                                            <span class="text-truncate-1">789 Business District, Bangalore</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-telephone text-secondary me-2"></i>
+                                            <span>+91 9876543212</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-box-seam text-secondary me-2"></i>
+                                            <span>10 items</span>
+                                        </li>
+                                        <li class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-event text-secondary me-2"></i>
+                                            <span>Expires: 6/20/2024</span>
+                                        </li>
+                                    </ul>
+                                    <div class="d-flex gap-2 mt-auto">
+                                        <button class="btn btn-view flex-fill">View</button>
+                                        <button class="btn btn-delete flex-fill">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="" style="min-width: 350px;">
+                            <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1466721591366-2d5fba72006d?w=300&amp;h=200&amp;fit=crop"
+                                    class="card-img-top" alt="Bread and Bakery Items">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title fw-semibold text-truncate-1 mb-0">Bread and Bakery
+                                            Items</h5>
+                                        <span class="badge-status badge-picked">Picked</span>
+                                    </div>
+                                    <p class="mb-3">Local Bakery</p>
+                                    <ul class="list-unstyled mb-4">
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-geo-alt text-secondary me-2"></i>
+                                            <span class="text-truncate-1">321 Baker Street, Chennai</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-telephone text-secondary me-2"></i>
+                                            <span>+91 9876543213</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-box-seam text-secondary me-2"></i>
+                                            <span>7 items</span>
+                                        </li>
+                                        <li class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-event text-secondary me-2"></i>
+                                            <span>Expires: 6/12/2024</span>
+                                        </li>
+                                    </ul>
+                                    <div class="d-flex gap-2 mt-auto">
+                                        <button class="btn btn-view flex-fill">View</button>
+                                        <button class="btn btn-delete flex-fill">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- New Donations -->
+            <div class="mb-5 p-4 rounded" style="background-color: var(--am-darktheme-light);">
+                <div class="d-flex justify-content-between align-items-center border-bottom border-secondary mb-4"
+                    style="color: var(--am-darktheme-font);">
+                    <h3>New Donations</h3>
+                    <a href="" style="text-decoration: none; color: var(--am-darktheme-font);">
+                        <h5>View all</h5>
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <div class="d-flex g-4 active-donation-cards text-white">
+                        <div class="me-4" style="min-width: 350px;">
+                            <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&amp;h=200&amp;fit=crop"
+                                    class="card-img-top" alt="Fresh Vegetables and Fruits">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title fw-semibold text-truncate-1 mb-0">Fresh Vegetables and
+                                            Fruits</h5>
+                                        <span class="badge-status badge-new">New</span>
+                                    </div>
+                                    <p class="mb-3">Local Restaurant</p>
+                                    <ul class="list-unstyled mb-4">
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-geo-alt text-secondary me-2"></i>
+                                            <span class="text-truncate-1">123 Main St, Downtown, Mumbai</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-telephone text-secondary me-2"></i>
+                                            <span>+91 9876543210</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-box-seam text-secondary me-2"></i>
+                                            <span>5 items</span>
+                                        </li>
+                                        <li class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-event text-secondary me-2"></i>
+                                            <span>Expires: 6/15/2024</span>
+                                        </li>
+                                    </ul>
+                                    <div class="d-flex gap-2 mt-auto">
+                                        <button class="btn btn-view flex-fill">Edit</button>
+                                        <button class="btn btn-delete flex-fill">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="me-4" style="min-width: 350px;">
+                            <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=300&amp;h=200&amp;fit=crop"
+                                    class="card-img-top" alt="Cooked Rice and Dal">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title fw-semibold text-truncate-1 mb-0">Cooked Rice and Dal
+                                        </h5>
+                                        <span class="badge-status badge-new">New</span>
+                                    </div>
+                                    <p class="mb-3">Community Kitchen</p>
+                                    <ul class="list-unstyled mb-4">
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-geo-alt text-secondary me-2"></i>
+                                            <span class="text-truncate-1">456 Park Ave, Central, Delhi</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-telephone text-secondary me-2"></i>
+                                            <span>+91 9876543211</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-box-seam text-secondary me-2"></i>
+                                            <span>3 items</span>
+                                        </li>
+                                        <li class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-event text-secondary me-2"></i>
+                                            <span>Expires: 6/13/2024</span>
+                                        </li>
+                                    </ul>
+                                    <div class="d-flex gap-2 mt-auto">
+                                        <button class="btn btn-view flex-fill">View</button>
+                                        <button class="btn btn-delete flex-fill">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="me-4" style="min-width: 350px;">
+                            <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1472396961693-142e6e269027?w=300&amp;h=200&amp;fit=crop"
+                                    class="card-img-top" alt="Packaged Snacks">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title fw-semibold text-truncate-1 mb-0">Packaged Snacks</h5>
+                                        <span class="badge-status badge-new">New</span>
+                                    </div>
+                                    <p class="mb-3">Corporate Event</p>
+                                    <ul class="list-unstyled mb-4">
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-geo-alt text-secondary me-2"></i>
+                                            <span class="text-truncate-1">789 Business District, Bangalore</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-telephone text-secondary me-2"></i>
+                                            <span>+91 9876543212</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-box-seam text-secondary me-2"></i>
+                                            <span>10 items</span>
+                                        </li>
+                                        <li class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-event text-secondary me-2"></i>
+                                            <span>Expires: 6/20/2024</span>
+                                        </li>
+                                    </ul>
+                                    <div class="d-flex gap-2 mt-auto">
+                                        <button class="btn btn-view flex-fill">View</button>
+                                        <button class="btn btn-delete flex-fill">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="" style="min-width: 350px;">
+                            <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1466721591366-2d5fba72006d?w=300&amp;h=200&amp;fit=crop"
+                                    class="card-img-top" alt="Bread and Bakery Items">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title fw-semibold text-truncate-1 mb-0">Bread and Bakery
+                                            Items</h5>
+                                        <span class="badge-status badge-new">New</span>
+                                    </div>
+                                    <p class="mb-3">Local Bakery</p>
+                                    <ul class="list-unstyled mb-4">
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-geo-alt text-secondary me-2"></i>
+                                            <span class="text-truncate-1">321 Baker Street, Chennai</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-telephone text-secondary me-2"></i>
+                                            <span>+91 9876543213</span>
+                                        </li>
+                                        <li class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-box-seam text-secondary me-2"></i>
+                                            <span>7 items</span>
+                                        </li>
+                                        <li class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-event text-secondary me-2"></i>
+                                            <span>Expires: 6/12/2024</span>
+                                        </li>
+                                    </ul>
+                                    <div class="d-flex gap-2 mt-auto">
+                                        <button class="btn btn-view flex-fill">View</button>
+                                        <button class="btn btn-delete flex-fill">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Volunteer Requests -->
+            <div class="mb-5 p-4 rounded" style="background-color: var(--am-darktheme-light);">
+                <div class="d-flex justify-content-between align-items-center border-bottom border-secondary mb-4"
+                    style="color: var(--am-darktheme-font);">
+                    <h3>Volunteer Requests</h3>
+                    <a href="" style="text-decoration: none; color: var(--am-darktheme-font);">
+                        <h5>View all</h5>
+                    </a>
+                </div>
+                <div class="p-0">
+                    <div class="d-flex align-items-start gap-3 border border-secondary rounded p-3 mb-3">
+                        <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=50&amp;h=50&amp;fit=crop"
+                            alt="Food For All Foundation" class="rounded-circle" width="48" height="48">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="fw-semibold">Priya Sharma</div>
+                                <span class="small">6/13/2024 5:00:00 PM</span>
+                            </div>
+                            <div class="small mb-1">Contact: +91 9876543220</div>
+                            <div class="mb-2">I would like to join with your NGO to contribute heartly.</div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-success btn-sm"><i class="bi bi-check2 me-2"></i>Accept</button>
+                                <button class="btn btn-danger btn-sm"><i class="bi bi-x me-2"></i>Reject</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start gap-3 border border-secondary rounded p-3 mb-3">
+                        <img src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=50&amp;h=50&amp;fit=crop"
+                            alt="Helping Hands NGO" class="rounded-circle" width="48" height="48">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="fw-semibold">Rahul Jain</div>
+                                <span class="small">6/13/2024 2:45:00 PM</span>
+                            </div>
+                            <div class="small mb-1">Contact: +91 9876543221</div>
+                            <div class="mb-2">Togather we can make a very large change in food wastage.</div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-success btn-sm"><i class="bi bi-check2 me-2"></i>Accept</button>
+                                <button class="btn btn-danger btn-sm"><i class="bi bi-x me-2"></i>Reject</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start gap-3 border border-secondary rounded p-3">
+                        <span class="rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                            style="width:48px;height:48px;">C</span>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="fw-semibold">Dhaval Pandya</div>
+                                <span class=" small">6/12/2024 10:15:00 PM</span>
+                            </div>
+                            <div class="small mb-1">Contact: +91 9876543222</div>
+                            <div class="mb-2">You're doing well and i want to join you to help you out.</div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-success btn-sm"><i class="bi bi-check2 me-2"></i>Accept</button>
+                                <button class="btn btn-danger btn-sm"><i class="bi bi-x me-2"></i>Reject</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

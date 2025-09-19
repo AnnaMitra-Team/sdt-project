@@ -1,0 +1,233 @@
+<%- include('../partials/header') %>
+
+<%- include('../partials/navbar-dark') %>
+
+<div class="d-flex am-dark" style="height: 95vh;">
+    
+    <%- include('../partials/sidebar-dark') %>
+
+    <div class="content w-100 p-4 ngo-dashboard" style="overflow-y: auto;">
+        <div class="w-100 text-white">
+            <div class="mb-4">
+                <h4>My Assignments</h4>
+                <p>View your pickup and delivery assignments</p>
+            </div>
+            <div class="mb-5 p-4 rounded" style="background-color: var(--am-darktheme-light);">
+                <div class="d-flex justify-content-between align-items-center border-bottom border-secondary mb-4"
+                    style="color: var(--am-darktheme-font);">
+                    <h3>Current Assignments</h3>
+                </div>
+                <div class="table-responsive am-dark-table">
+                    <table class="table align-middle rounded-2 shadow-sm overflow-hidden border-secondary">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Title</th>
+                                <th>Food Items</th>
+                                <th>Type</th>
+                                <th>Cook Date &amp; Time</th>
+                                <th>Status</th>
+                                <th>Images</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="all-table-body">
+                            <tr>
+                                <td>1</td>
+                                <td class="col-title">Fresh Vegetables and Fruits</td>
+                                <td class="col-items"><i class="bi bi-box-seam pe-1"
+                                        style="color: #bababa; font-size: 0.9rem;"></i> Carrots, Beans, Apples</td>
+                                <td style="min-width: auto;">
+                                    <div>
+                                        <div class="badge badge-type rounded-4 px-3 py-2 m-1">Raw</div>
+                                    </div>
+                                </td>
+                                <td class="col-cookdate">
+                                    <div><i class="fa-regular fa-calendar pe-1"
+                                            style="color: #bababa; font-size: 0.9rem;"></i>
+                                        2024-06-12</div>
+                                    <div><i class="fa-regular fa-clock"
+                                            style="color: #bababa; font-size: 0.9rem;"></i> 12:30</div>
+                                </td>
+                                <td><span class="badge badge-new">New</span></td>
+                                <td class="col-images">
+                                    <div class="border border-secondary rounded p-1 text-center mx-auto"
+                                        style="max-width: 100px;">
+                                        <img src="https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=60&amp;h=60&amp;fit=crop"
+                                            alt="food item" class="img-fluid">
+                                        <div class="text-center hover-blue" data-bs-toggle="modal"
+                                            data-bs-target="#images-modal">View
+                                            all</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="mx-auto text-center">
+                                        <button class="btn btn-sm btn-outline-primary m-1" title="Edit"><i
+                                                class="fas fa-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger m-1" title="Delete"><i
+                                                class="fas fa-trash-alt"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>2</td>
+                                <td class="col-title">Cooked Rice and Dal</td>
+                                <td class="col-items"><i class="bi bi-box-seam pe-1"
+                                        style="color: #bababa; font-size: 0.9rem;"></i> Rice, Dal</td>
+                                <td style="min-width: auto;">
+                                    <div>
+                                        <div class="badge badge-type rounded-4 px-3 py-2 m-1">Cooked</div>
+                                    </div>
+                                </td>
+                                <td class="col-cookdate">
+                                    <div><i class="fa-regular fa-calendar pe-1"
+                                            style="color: #bababa; font-size: 0.9rem;"></i>
+                                        2024-06-13</div>
+                                    <div><i class="fa-regular fa-clock"
+                                            style="color: #bababa; font-size: 0.9rem;"></i> 12:30</div>
+                                </td>
+                                <td><span class="badge badge-pending">Pending</span></td>
+                                <td class="col-images">
+                                    <div class="border border-secondary rounded p-1 text-center mx-auto"
+                                        style="max-width: 100px;">
+                                        <img src="https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=60&amp;h=60&amp;fit=crop"
+                                            alt="food item" class="img-fluid">
+                                        <div class="text-center hover-blue" data-bs-toggle="modal"
+                                            data-bs-target="#images-modal">View
+                                            all</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="mx-auto text-center">
+                                        <button class="btn btn-sm btn-outline-primary m-1" title="Edit"><i
+                                                class="fas fa-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger m-1" title="Delete"><i
+                                                class="fas fa-trash-alt"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>3</td>
+                                <td class="col-title">Packaged Snacks</td>
+                                <td class="col-items"><i class="bi bi-box-seam pe-1"
+                                        style="color: #bababa; font-size: 0.9rem;"></i> Chips, Biscuits</td>
+                                <td style="min-width: auto;">
+                                    <div>
+                                        <div class="badge badge-type rounded-4 px-3 py-2 m-1">Packaged</div>
+                                    </div>
+                                </td>
+                                <td class="col-cookdate">
+                                    <div><i class="fa-regular fa-calendar pe-1"
+                                            style="color: #bababa; font-size: 0.9rem;"></i>
+                                        2024-06-10</div>
+                                    <div><i class="fa-regular fa-clock"
+                                            style="color: #bababa; font-size: 0.9rem;"></i> 12:30</div>
+                                </td>
+                                <td><span class="badge badge-picked">Picked</span></td>
+                                <td class="col-images">
+                                    <div class="border border-secondary rounded p-1 text-center mx-auto"
+                                        style="max-width: 100px;">
+                                        <img src="https://images.unsplash.com/photo-1472396961693-142e6e269027?w=60&amp;h=60&amp;fit=crop"
+                                            alt="food item" class="img-fluid">
+                                        <div class="text-center hover-blue" data-bs-toggle="modal"
+                                            data-bs-target="#images-modal">View
+                                            all</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="mx-auto text-center">
+                                        <button class="btn btn-sm btn-outline-primary m-1" title="Edit"><i
+                                                class="fas fa-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger m-1" title="Delete"><i
+                                                class="fas fa-trash-alt"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>4</td>
+                                <td class="col-title">Bread and Bakery Items</td>
+                                <td class="col-items"><i class="bi bi-box-seam pe-1"
+                                        style="color: #bababa; font-size: 0.9rem;"></i> Bread, Croissants</td>
+                                <td style="min-width: auto;">
+                                    <div>
+                                        <div class="badge badge-type rounded-4 px-3 py-2 m-1">Bakery</div>
+                                    </div>
+                                </td>
+                                <td class="col-cookdate">
+                                    <div><i class="fa-regular fa-calendar pe-1"
+                                            style="color: #bababa; font-size: 0.9rem;"></i>
+                                        2024-06-09</div>
+                                    <div><i class="fa-regular fa-clock"
+                                            style="color: #bababa; font-size: 0.9rem;"></i> 12:30</div>
+                                </td>
+                                <td><span class="badge badge-completed">Completed</span></td>
+                                <td class="col-images">
+                                    <div class="border border-secondary rounded p-1 text-center mx-auto"
+                                        style="max-width: 100px;">
+                                        <img src="https://images.unsplash.com/photo-1466721591366-2d5fba72006d?w=60&amp;h=60&amp;fit=crop"
+                                            alt="food item" class="img-fluid">
+                                        <div class="text-center hover-blue" data-bs-toggle="modal"
+                                            data-bs-target="#images-modal">View
+                                            all</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="mx-auto text-center">
+                                        <button class="btn btn-sm btn-outline-primary m-1" title="Edit"><i
+                                                class="fas fa-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger m-1" title="Delete"><i
+                                                class="fas fa-trash-alt"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>5</td>
+                                <td class="col-title">Fruit Juices</td>
+                                <td class="col-items"><i class="bi bi-box-seam pe-1"
+                                        style="color: #bababa; font-size: 0.9rem;"></i> Orange Juice, Apple Juice
+                                </td>
+                                <td style="min-width: auto;">
+                                    <div>
+                                        <div class="badge badge-type rounded-4 px-3 py-2 m-1">Beverage</div>
+                                    </div>
+                                </td>
+                                <td class="col-cookdate">
+                                    <div><i class="fa-regular fa-calendar pe-1"
+                                            style="color: #bababa; font-size: 0.9rem;"></i>
+                                        2024-06-13</div>
+                                    <div><i class="fa-regular fa-clock"
+                                            style="color: #bababa; font-size: 0.9rem;"></i> 12:30</div>
+                                </td>
+                                <td><span class="badge badge-new">New</span></td>
+                                <td class="col-images">
+                                    <div class="border border-secondary rounded p-1 text-center mx-auto"
+                                        style="max-width: 100px;">
+                                        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=60&amp;h=60&amp;fit=crop"
+                                            alt="food item" class="img-fluid">
+                                        <div class="text-center hover-blue" data-bs-toggle="modal"
+                                            data-bs-target="#images-modal">View
+                                            all</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="mx-auto text-center">
+                                        <button class="btn btn-sm btn-outline-primary m-1" title="Edit"><i
+                                                class="fas fa-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger m-1" title="Delete"><i
+                                                class="fas fa-trash-alt"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
