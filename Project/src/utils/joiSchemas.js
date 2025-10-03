@@ -39,8 +39,8 @@ const foodItemSchema = Joi.object({
     unit: Joi.string().valid(...quantityUnitOptions).required(),
     type: Joi.string().valid(...foodTypeOptions).required(),
     condition: Joi.string().valid(...foodConditionOptions).required(),
-    expiryDate: Joi.date().optional(),
-    expiryTime: Joi.string().optional(),
+    expiryDate: Joi.date().optional().allow(null),
+    expiryTime: Joi.string().optional().allow(null),
     cookedDate: Joi.date().required(),
     cookedTime: Joi.string().required(),
     itemImages: Joi.array().items(Joi.string()).min(1).max(3).required()
@@ -49,19 +49,19 @@ const foodItemSchema = Joi.object({
 // Main donation schema
 module.exports.donationSchema = Joi.object({
     donation: Joi.object({
-        donorId: Joi.string()
-            .custom((value, helpers) => {
+        donorId: Joi.custom((value, helpers) => {
                 if (!mongoose.Types.ObjectId.isValid(value)) {
                     return helpers.error("any.invalid");
                 }
                 return value;
             }).required(),
 
+        title: Joi.string().trim().max(100).required(),
         items: Joi.array().items(foodItemSchema).min(1).required(),
         source: Joi.string().valid(...foodSourceOptions).required(),
         items: Joi.array().items(foodItemSchema).min(1).required(),
         numberOfPeopleFed: Joi.number().min(1).required(),
-        description: Joi.string().trim().allow('').optional(),
+        description: Joi.string().trim().allow('', null).optional(),
         images: Joi.array().items(Joi.string()).min(1).max(5).required(),
         status: Joi.string().valid(...donationStatusOptions).default('New'),
         address: Joi.string().max(300).required(),
@@ -88,7 +88,7 @@ module.exports.donationSchema = Joi.object({
         otpGeneratedAt: Joi.date().allow(null).optional(),
 
         pickedAt: Joi.date().allow(null).optional()
-    }).required()
+    }).unknown(true).required()
 });
 
 

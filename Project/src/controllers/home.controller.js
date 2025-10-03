@@ -1,4 +1,5 @@
 const User = require('../models/user.model');
+const Donation = require('../models/donation.model');
 const catchAsync = require('../utils/catchAsync');
 const safeRender = require('../utils/safeRender');
 
@@ -34,8 +35,13 @@ module.exports.renderContactPage = (req, res, next) => {
 }
 
 module.exports.testRoute = catchAsync(async (req, res) => {
-    throw new Error('testing error');
+    // throw new Error('testing error');
     try {
+        // fetch donations sorted by date - newest first
+        const donations = await Donation.find({}).sort({ createdAt: -1 });
+        res.json(donations);
+
+
         // const users = await User.find({role: 'Volunteer'}, {_id:1, firstName: 1});
         // res.json(users);
         // console.log(users);
