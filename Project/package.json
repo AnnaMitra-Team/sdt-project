@@ -4,7 +4,7 @@
   "description": "This is an real time solution of food wastage by donating it to the needy people with the help of NGOs.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha \"__tests__/**/*.test.js\"",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
@@ -21,9 +21,15 @@
     "mongoose": "^8.16.3",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
+    "napi-postinstall": "^0.3.3",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^8.0.0",
     "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "chai": "^6.0.1",
+    "mocha": "^11.7.2",
+    "sinon": "^21.0.0"
   }
 }

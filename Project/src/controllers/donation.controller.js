@@ -8,6 +8,8 @@ const mongoose = require('mongoose');
 const safeRender = require('../utils/safeRender');
 const catchAsync = require('../utils/catchAsync');
 
+const { deleteFiles } = require('../helpers/donation.helpers'); // Import the new helpers
+
 
 // Render the donation form
 module.exports.renderDonationForm = (req, res, next) => {
@@ -20,55 +22,7 @@ module.exports.renderDonationForm = (req, res, next) => {
 }
 
 // Handle the donation form submission
-module.exports.submitDonationForm = catchAsync(async (req, res) => {
-
-    let donationImages = [];
-    let foodItemsMap = [];
-    let donorID = null;
-    const formFields = req.body;
-
-    if(formFields.description === 'null' || formFields.description === '') {
-        formFields.description = null;
-    }
-
-    donorID = await userController.findOneUserId('Donor');
-
-    const {
-        title,
-        source,
-        numberOfPeopleFed,
-        description,
-        address,
-        city,
-        state,
-        pincode = '362001',
-        latitude,
-        longitude,
-        personName,
-        contact,
-        email
-    } = formFields;
-
-    const donationData = {
-        donorId: donorID,
-        title,
-        source,
-        items: foodItemsMap,
-        numberOfPeopleFed: parseInt(numberOfPeopleFed),
-        description,
-        images: donationImages,
-        address,
-        city,
-        state,
-        pincode,
-        location: {
-            longitude,
-            latitude
-        },
-        personName,
-        contact,
-        email
-    };
+module.exports.submitDonationForm = catchAsync(async (req, res, next) => {
 
     if (mongoose.connection.readyState !== 1) {
         console.error('Database connection is not ready');
@@ -76,55 +30,10 @@ module.exports.submitDonationForm = catchAsync(async (req, res) => {
     }
 
     try {
-        for(let itemIndex in formFields.foodItems) {
-            tempItem = formFields.foodItems[itemIndex];
-            if( !tempItem.name && !tempItem.quantity && !tempItem.unit && !tempItem.type && !tempItem.condition && !tempItem.cookedDate && !tempItem.cookedTime) {
-                continue;
-            }
-            if( tempItem.expiryDate === 'null' || tempItem.expiryDate === '') {
-                tempItem.expiryDate = null;
-            }
-            if( tempItem.expiryTime === 'null' || tempItem.expiryTime === '') {
-                tempItem.expiryTime = null;
-            }
-            console.log('food item found', tempItem);
-            let item = {
-                name: tempItem.name,
-                quantity: parseInt(tempItem.quantity),
-                unit: tempItem.unit,
-                type: tempItem.type,
-                condition: tempItem.condition,
-                cookedDate: tempItem.cookedDate,
-                cookedTime: tempItem.cookedTime,
-                expiryDate: tempItem.expiryDate,
-                expiryTime: tempItem.expiryTime,
-            }
-            foodItemsMap.push(item);
-        }
-
-        // Handle file uploads / get image file paths
-        req.files.forEach(file => {
-            const { fieldname, path } = file;
-
-            // Store donation images
-            if (fieldname.startsWith('images')) {
-                donationImages.push('/' + path.replace(/\\/g, '/').split('public/')[1]);
-            }
-
-            // Store food item images
-            const match = fieldname.match(/^foodItems\[(\d+)]\[itemImages]\[(\d+)]$/);
-            if (match) {
-                const index = match[1];
-                if (!foodItemsMap[index].itemImages) foodItemsMap[index].itemImages = [];
-                // if (!foodItemsMap[index].itemImages) foodItemsMap[index].itemImages = [];
-                foodItemsMap[index].itemImages.push('/' + path.replace(/\\/g, '/').split('public/')[1]);
-            }
-        });
-
         console.log('-----------------------------------------');
-        console.log(donationData, 'donationData printed');
+        // console.log('Donation:', req.donation);
 
-        const donation = new Donation(donationData);
+        const donation = new Donation(req.donation);
         await donation.save();
 
         return res.status(201).json({
@@ -239,177 +148,40 @@ module.exports.renderEditDonationForm = catchAsync(async (req, res, next) => {
     }
 })
 
-// Handle edit donation form submission
 module.exports.submitEditDonationForm = catchAsync(async (req, res) => {
-
-    let donationImages = [];
-    let foodItemsMap = [];
-    let oldImages = [];
-    const formFields = req.body;
-
-    if(formFields.description === 'null' || formFields.description === '') {
-        formFields.description = null;
-    }
-
-    const {
-        donationId,
-        title,
-        source,
-        numberOfPeopleFed,
-        description,
-        address,
-        city,
-        state,
-        pincode = '362001',
-        latitude,
-        longitude,
-        personName,
-        contact,
-        email
-    } = formFields;
-
-    const donationData = {
-        title,
-        source,
-        items: foodItemsMap,
-        numberOfPeopleFed: parseInt(numberOfPeopleFed),
-        description,
-        images: donationImages,
-        address,
-        city,
-        state,
-        pincode,
-        location: {
-            longitude,
-            latitude
-        },
-        personName,
-        contact,
-        email
-    };
+    // return res.status(400).json({success: false, message: 'failll'});
 
     if (mongoose.connection.readyState !== 1) {
         console.error('Database connection is not ready');
-        return res.json({ success: false, message: 'Database connection error! Faild to update donation.' });
+        return res.json({ success: false, message: 'Database connection error! Faild to upload donation.' });
     }
 
-    console.log('-----------------------------------------');
-    console.log(formFields, 'formFields printed');
-    console.log('-----------------------------------------');
-
     try {
-        // Collect food items from form fields
-        for(let itemIndex in formFields.foodItems) {
-            let tempItem = formFields.foodItems[itemIndex];
-            if( !tempItem.name && !tempItem.quantity && !tempItem.unit && !tempItem.type && !tempItem.condition && !tempItem.cookedDate && !tempItem.cookedTime) {
-                continue;
-            }
-            if( tempItem.expiryDate === 'null' || tempItem.expiryDate === '') {
-                tempItem.expiryDate = null;
-            }
-            if( tempItem.expiryTime === 'null' || tempItem.expiryTime === '') {
-                tempItem.expiryTime = null;
-            }
-            console.log('food item found', tempItem);
-            let item = {
-                name: tempItem.name,
-                quantity: parseInt(tempItem.quantity),
-                unit: tempItem.unit,
-                type: tempItem.type,
-                condition: tempItem.condition,
-                itemImages: tempItem.itemImages || [],
-                cookedDate: tempItem.cookedDate,
-                cookedTime: tempItem.cookedTime,
-                expiryDate: tempItem.expiryDate,
-                expiryTime: tempItem.expiryTime,
-            }
-            foodItemsMap.push(item);
+        const { donation, oldImages } = req;
+        const donationId = req.params.id;
 
-            // Collect old item images if they exist
-            if (tempItem.oldItemImages && tempItem.oldItemImages.length > 0) {
-                oldImages.push(...tempItem.oldItemImages);
-            }
-        }
-
-        // Handle file uploads / get image file paths
-        req.files.forEach(file => {
-            const { fieldname, path } = file;
-
-            // Store donation images
-            if (fieldname.startsWith('images')) {
-                donationImages.push('/' + path.replace(/\\/g, '/').split('public/')[1]);
-            }
-
-            // Store food item images
-            const match = fieldname.match(/^foodItems\[(\d+)]\[itemImages]\[(\d+)]$/);
-            if (match) {
-                const index = match[1];
-                if (!foodItemsMap[index].itemImages) foodItemsMap[index].itemImages = [];
-                // if (!foodItemsMap[index].itemImages) foodItemsMap[index].itemImages = [];
-                foodItemsMap[index].itemImages.push('/' + path.replace(/\\/g, '/').split('public/')[1]);
-            }
-        });
-
-        // If no new images are uploaded, use old images | and if found, collect old images
-        if(donationImages.length === 0) {
-            formFields.donationImages.forEach((image, i) => {
-                if (image) {
-                    donationImages.push(image);
-                }
-            });
-        }
-        else {
-            oldImages.push(...formFields.oldDonationImages);
-        }
-
-        console.log('-----------------------------------------');
-        console.log(donationData, 'donationData printed');
-        console.log('-----------------------------------------\n\n');
-        foodItemsMap.forEach((item, index) => {
-            console.log(item['itemImages']);
-        });
-        console.log('-----------------------------------------\n\n');
-        console.log(oldImages, 'oldImages printed');
-        console.log('-----------------------------------------\n\n');
-
-        // Delete old images if they exist
-        if (oldImages.length > 0) {
-            oldImages.forEach(image => {
-                console.log(`Deleting old image: ${image}`);
-                // first check if the image exists in /images/donations directory
-                const imagePath = 'public/' + image.replace(/^\//, '');
-                if (fs.existsSync(imagePath)) {
-                    fs.unlinkSync(imagePath);
-                    console.log(`Deleted old image: ${image}`);
-                } else {
-                    console.warn(`Old image not found, skipping deletion: ${image}`);
-                }
-            });
-        }
-
-        // Validate donationId
         if (!mongoose.Types.ObjectId.isValid(donationId)) {
             return res.status(400).json({ success: false, message: 'Invalid donation ID.' });
         }
 
-        // Now update the donation in the database
-        const donation = await Donation.findByIdAndUpdate(donationId, donationData, { new: true });
-        if (!donation) {
+        const newDonation = await Donation.findByIdAndUpdate(donationId, donation, { new: true });
+
+        if (!newDonation) {
             return res.status(404).json({ success: false, message: 'Donation not found! Failed to update.' });
         }
 
-        console.log('\n\n\nDonation updated successfully:', donation);
+        deleteFiles(oldImages);
 
-        return res.status(201).json({
+        return res.status(200).json({
             success: true,
-            message: 'Donation created successfully.',
-            donationId: donation._id
+            message: 'Donation updated successfully.',
+            donationId: newDonation._id
         });
     } catch (error) {
-        console.error('Error creating donation:', error);
-        return res.status(500).json({ success: false, message: 'Server error while saving donation.' });
+        console.error('Error updating donation:', error);
+        return res.status(500).json({ success: false, message: 'Server error while updating donation.' });
     }
-})
+});
 
 // Delete a donation
 module.exports.deleteDonation = catchAsync(async (req, res) => {
@@ -417,6 +189,11 @@ module.exports.deleteDonation = catchAsync(async (req, res) => {
 
     if (!mongoose.Types.ObjectId.isValid(donationId)) {
         return res.status(400).json({ success: false, message: 'Invalid donation ID.' });
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+        console.error('Database connection is not ready');
+        return res.json({ success: false, message: 'Database connection error! Faild to upload donation.' });
     }
 
     try {

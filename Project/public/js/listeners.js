@@ -1,4 +1,3 @@
-
 window.foodItems = window.foodItems || [];
 let imagesModalURLs = [];
 let imagesModalIndex = 0;
@@ -206,25 +205,25 @@ function handleOpenEditFoodItemModal(event) {
     const form = document.getElementById('editItemForm');
 
     // Fill the input fields
-    form.elements['name'].value = item.name || '';
-    form.elements['quantity'].value = item.quantity || '';
-    form.elements['unit'].value = item.unit || '';
-    form.elements['type'].value = item.type || '';
-    form.elements['condition'].value = item.condition || '';
+    form.elements['item[name]'].value = item.name || '';
+    form.elements['item[quantity]'].value = item.quantity || '';
+    form.elements['item[unit]'].value = item.unit || '';
+    form.elements['item[type]'].value = item.type || '';
+    form.elements['item[condition]'].value = item.condition || '';
 
     // Expiry
     if (item.expiryDate && item.expiryDate.length > 10) {
         item.expiryDate = item.expiryDate.slice(0, 10); // Ensure date is in YYYY-MM-DD format
     }
-    form.elements['expiryDate'].value = item.expiryDate || '';
-    form.elements['expiryTime'].value = item.expiryTime || '';
+    form.elements['item[expiryDate]'].value = item.expiryDate || '';
+    form.elements['item[expiryTime]'].value = item.expiryTime || '';
 
     // Cooked
     if (item.cookedDate && item.cookedDate.length > 10) {
         item.cookedDate = item.cookedDate.slice(0, 10); // Ensure date is in YYYY-MM-DD format
     }
-    form.elements['cookedDate'].value = item.cookedDate || '';
-    form.elements['cookedTime'].value = item.cookedTime || '';
+    form.elements['item[cookedDate]'].value = item.cookedDate || '';
+    form.elements['item[cookedTime]'].value = item.cookedTime || '';
 
     // Clear preview area first
     const previewContainer = form.querySelector('.imagesPreview');
@@ -279,8 +278,8 @@ function handleGetCurrentLocation() {
                 marker.setLatLng([lat, lng]);
                 map.setView([lat, lng], 15);
                 updateAddress(lat, lng);
-                document.querySelector("input[name='latitude']").value = lat;
-                document.querySelector("input[name='longitude']").value = lng;
+                document.querySelector("input[name='donation[latitude]']").value = lat;
+                document.querySelector("input[name='donation[longitude]']").value = lng;
             },
             function (error) {
                 switch (error.code) {
@@ -317,8 +316,8 @@ function handleSetCityLocation(event) {
                 const lat = parseFloat(data[0].lat);
                 const lon = parseFloat(data[0].lon);
                 // console.log(`Coordinates for ${cityName}:`, lat, lon);
-                document.querySelector("input[name='latitude']").value = lat;
-                document.querySelector("input[name='longitude']").value = lon;
+                document.querySelector("input[name='donation[latitude]']").value = lat;
+                document.querySelector("input[name='donation[longitude]']").value = lon;
                 map.setView([lat, lon], 12);
                 marker.setLatLng([lat, lon]);
                 updateAddress(lat, lon);

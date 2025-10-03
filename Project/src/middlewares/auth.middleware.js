@@ -71,6 +71,8 @@ module.exports.validateRegistrationData = async (req, res, next) => {
             if (!req.body.ngoProfile) {
                 return res.status(400).send({ success: false, message: 'NGO profile data is required' });
             }
+
+            // Handle file uploads / get document file paths
             const ngoDocuments = [];
             req.files.forEach(file => {
                 const { fieldname, path } = file;
@@ -81,6 +83,7 @@ module.exports.validateRegistrationData = async (req, res, next) => {
                 }
             });
             req.body.ngoProfile.documents = ngoDocuments;
+            
             console.log('Validating NGO Profile Schema');
             await joiSchemas.ngoProfileSchema.validateAsync(req.body);
         } else if (user.role === 'Volunteer') {

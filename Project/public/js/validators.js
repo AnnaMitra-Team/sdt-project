@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', (e) => {
 
     console.log('validators loaded');
@@ -464,7 +463,7 @@ function loginUser(form) {
 function validateDonationForm(donationForm, action) {
     console.log('Donation form found');
 
-    const donationImages = donationForm.querySelector('[name="images[]"]');
+    const donationImages = donationForm.querySelector('[name="donation[images[]]"]');
 
     const showError = (input, message) => {
         const formGroup = input.closest('div');
@@ -485,12 +484,14 @@ function validateDonationForm(donationForm, action) {
 
     const isPhoneValid = phone => /^\d{10}$/.test(phone.trim());
 
+    const isPincodeValid = pincode => /^\d{6}$/.test(pincode.trim());
+
     const validateForm = () => {
         let isValid = true;
 
         const requiredFields = [
-            'title', 'source', 'numberOfPeopleFed', 'address', 'city',
-            'state', 'personName', 'contact', 'email'
+            'donation[title]', 'donation[source]', 'donation[numberOfPeopleFed]', 'donation[address]', 'donation[city]',
+            'donation[state]', 'donation[pincode]', 'donation[personName]', 'donation[contact]', 'donation[email]'
         ];
 
         requiredFields.forEach(name => {
@@ -505,15 +506,21 @@ function validateDonationForm(donationForm, action) {
             }
         });
 
-        const emailInput = donationForm.querySelector('[name="email"]');
+        const emailInput = donationForm.querySelector('[name="donation[email]"]');
         if (emailInput && emailInput.value && !isEmailValid(emailInput.value)) {
             showError(emailInput, 'Invalid email address.');
             isValid = false;
         }
 
-        const phoneInput = donationForm.querySelector('[name="contact"]');
+        const phoneInput = donationForm.querySelector('[name="donation[contact]"]');
         if (phoneInput && phoneInput.value && !isPhoneValid(phoneInput.value)) {
             showError(phoneInput, 'Enter a valid 10-digit contact number.');
+            isValid = false;
+        }
+
+        const pincodeInput = donationForm.querySelector('[name="donation[pincode]"]');
+        if (pincodeInput && pincodeInput.value && !isPincodeValid(pincodeInput.value)) {
+            showError(pincodeInput, 'Enter a valid 6-digit pincode.');
             isValid = false;
         }
 
@@ -560,13 +567,13 @@ function validateDonationForm(donationForm, action) {
 
 function handleSubmitFoodDonataionForm(e, donationForm, action) {
     const formData = new FormData(donationForm);
-    const donationImageFiles = donationForm.querySelector('input[name="images[]"]').files;
+    const donationImageFiles = donationForm.querySelector('input[name="donation[images[]]"]').files;
     let path = "";
     if (action === 'new') {
-        path = "/donations/new";
+        path = "/donations/";
     }
     else if (action === 'edit') {
-        path = `/donations/${formData.get('donationId')}/edit`;
+        path = `/donations/${formData.get('donationId')}?_method=PUT`;
     }
 
     // Append each food item as nested fields
@@ -604,14 +611,14 @@ function handleSubmitFoodDonataionForm(e, donationForm, action) {
             // If editing and new images selected, append old images if any
             const oldDonationImages = window.oldDonationImages || [];
             oldDonationImages.forEach((image, i) => {
-                formData.append(`oldDonationImages[${i}]`, image);
+                formData.append(`donation[oldDonationImages][${i}]`, image);
             });
         }
         else {
             // If editing and no new images, append old images as donation images if any
             const oldDonationImages = window.oldDonationImages || [];
             oldDonationImages.forEach((image, i) => {
-                formData.append(`donationImages[${i}]`, image);
+                formData.append(`donation[images][${i}]`, image);
             });
         }
     }
@@ -653,16 +660,16 @@ function handleSubmitFoodDonataionForm(e, donationForm, action) {
 
 // Function to validate the item form
 function validateItemForm(form, action) {
-    const name = form.querySelector('[name="name"]');
-    const quantity = form.querySelector('[name="quantity"]');
-    const unit = form.querySelector('[name="unit"]');
-    const type = form.querySelector('[name="type"]');
-    const condition = form.querySelector('[name="condition"]');
-    const expiryDate = form.querySelector('[name="expiryDate"]');
-    const expiryTime = form.querySelector('[name="expiryTime"]');
-    const cookedDate = form.querySelector('[name="cookedDate"]');
-    const cookedTime = form.querySelector('[name="cookedTime"]');
-    const itemImages = form.querySelector('[name="itemImages[]"]');
+    const name = form.querySelector('[name="item[name]"]');
+    const quantity = form.querySelector('[name="item[quantity]"]');
+    const unit = form.querySelector('[name="item[unit]"]');
+    const type = form.querySelector('[name="item[type]"]');
+    const condition = form.querySelector('[name="item[condition]"]');
+    const expiryDate = form.querySelector('[name="item[expiryDate]"]');
+    const expiryTime = form.querySelector('[name="item[expiryTime]"]');
+    const cookedDate = form.querySelector('[name="item[cookedDate]"]');
+    const cookedTime = form.querySelector('[name="item[cookedTime]"]');
+    const itemImages = form.querySelector('[name="item[images[]]"]');
 
     const showError = (input, message) => {
         const formGroup = input.closest('.mb-4') || input.parentElement;
@@ -796,9 +803,21 @@ function handleNewFoodItem(event) {
     }
 
     const formData = new FormData(itemForm);
-    let itemDetails = Object.fromEntries(formData.entries());
-    itemDetails['itemImages'] = selectedItemImages;
-    const imageFiles = itemForm.querySelector('input[name="itemImages[]"]').files;
+    let rawDetails = Object.fromEntries(formData.entries());
+    let itemDetails = {
+        name: rawDetails['item[name]'],
+        quantity: rawDetails['item[quantity]'],
+        unit: rawDetails['item[unit]'],
+        type: rawDetails['item[type]'],
+        condition: rawDetails['item[condition]'],
+        expiryDate: rawDetails['item[expiryDate]'],
+        expiryTime: rawDetails['item[expiryTime]'],
+        cookedDate: rawDetails['item[cookedDate]'],
+        cookedTime: rawDetails['item[cookedTime]'],
+        // images handled separately
+    };
+    itemDetails.itemImages = selectedItemImages;
+    const imageFiles = itemForm.querySelector('input[name="item[images[]]"]').files;
     itemDetails.itemImageFiles = Array.from(imageFiles); // store File objects, not blob URLs
     foodItems.push(itemDetails);
     // console.log(itemDetails);
@@ -864,15 +883,27 @@ function handleTableInsert() {
 // Function to handle the edit food item form submission
 function handleEditFoodItem(event) {
     event.preventDefault(); // Prevent the form from submitting normally
+    console.log('Editing item...');
 
     const form = event.target;
     const itemIndex = parseInt(form.dataset.index); // Get the index of the item being edited
-    let updatedItem = Object.fromEntries(new FormData(form).entries());
+    let rawDetails = Object.fromEntries(new FormData(form).entries());
+    let updatedItem = {
+        name: rawDetails['item[name]'],
+        quantity: rawDetails['item[quantity]'],
+        unit: rawDetails['item[unit]'],
+        type: rawDetails['item[type]'],
+        condition: rawDetails['item[condition]'],
+        expiryDate: rawDetails['item[expiryDate]'],
+        expiryTime: rawDetails['item[expiryTime]'],
+        cookedDate: rawDetails['item[cookedDate]'],
+        cookedTime: rawDetails['item[cookedTime]'],
+        // images handled separately
+    };
 
-    const imageFiles = form.querySelector('input[name="itemImages[]"]').files;
+    const imageFiles = form.querySelector('input[name="item[images[]]"]').files;
     if (imageFiles.length === 0) {
         updatedItem['itemImages'] = foodItems[itemIndex].itemImages; // Keep existing images if no new ones
-        updatedItem['itemImageFiles'] = foodItems[itemIndex].itemImageFiles; // Keep existing files
     }
     else {
         updatedItem['itemImages'] = selectedItemImages;
@@ -884,7 +915,9 @@ function handleEditFoodItem(event) {
 
     // Update the table row
     const itemsTable = document.getElementById('itemsTable');
+    console.log(itemsTable);
     const row = itemsTable.rows[itemIndex + 1]; // Adjust for header row
+    console.log(updatedItem);
 
     row.cells[1].innerText = updatedItem.name;
     row.cells[2].innerText = updatedItem.type;
