@@ -65,6 +65,30 @@ function showAlert(type = 'info', message = 'This is a message') {
 }
 
 
+function logoutUser() {
+    fetch('/auth/logout', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            setTimeout(() => {
+                window.location.href = '/auth/login';
+            }, 700);
+        } else {
+            showAlert('danger', data.message || 'Logout failed.');
+        }
+    })
+    .catch(error => {
+        console.error('Error during logout:', error);
+        showAlert('danger', 'An error occurred during logout.');
+    });
+}
+
 
 // Generate dynamic registration form
 function renderForm() {

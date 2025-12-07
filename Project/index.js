@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config({ path: '.env.test' });
+}
+
 // Import core packages
 require('dotenv').config();
 const express = require('express');
@@ -38,7 +42,9 @@ const volunteerRoutes = require('./src/routes/volunteer.routes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'thisshouldbeabettersecret!';
-connectDB();
+if (process.env.NODE_ENV !== "test") {
+    connectDB();
+}
 
 
 
@@ -221,6 +227,7 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server with Socket.IO is running on http://localhost:${PORT}`);
 });
 
+module.exports = app;
 
 
 

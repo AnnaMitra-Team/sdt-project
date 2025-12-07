@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', (e) => {
 
     console.log('validators loaded');
@@ -19,6 +18,23 @@ document.addEventListener('DOMContentLoaded', (e) => {
     if (registrationForm) {
         validateRegistrationForm(registrationForm);
     }
+
+
+
+
+    //  ==========================  Forgot & reset password page JS  ============================
+
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    if (forgotPasswordForm) {
+        validateForgetResetForm(forgotPasswordForm);
+    }
+    const resetPasswordForm = document.getElementById('resetPasswordForm');
+    if (resetPasswordForm) {
+        validateForgetResetForm(resetPasswordForm);
+    }
+
+
+
 
 
 
@@ -94,7 +110,7 @@ function validateRegistrationForm(form) {
     };
 
     const isEmailValid = (email) => {
-        const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        const re = /^[a-zA-Z0-9._&-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
         return re.test(String(email).toLowerCase());
     };
 
@@ -381,7 +397,7 @@ function validateLoginForm(form) {
     };
 
     const isEmailValid = (email) => {
-        const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        const re = /^[a-zA-Z0-9._&-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
         return re.test(String(email).toLowerCase());
     };
 
@@ -459,12 +475,165 @@ function loginUser(form) {
 
 
 
+// Function to validate the forgot and reset password form
+function validateForgetResetForm(form) {
+    console.log('Form found:', form.id);
+
+    // Inputs
+    const email = form.querySelector('#email');
+    const password = form.querySelector('#password');
+    const cpassword = form.querySelector('#cpassword');
+
+    // Helper functions
+    const showError = (input, message) => {
+        const formGroup = input.parentElement;
+        input.classList.add('input-error');
+        const error = formGroup.querySelector('.error-message');
+        if (error) error.textContent = message;
+    };
+
+    const showSuccess = (input) => {
+        const formGroup = input.parentElement;
+        input.classList.remove('input-error');
+        const error = formGroup.querySelector('.error-message');
+        if (error) error.textContent = '';
+    };
+
+    const isEmailValid = (email) => {
+        const re = /^[a-zA-Z0-9._&-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        return re.test(String(email).toLowerCase());
+    };
+
+    const isPasswordSecure = (password) => {
+        const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+        return re.test(password);
+    };
+
+    const validateForm = () => {
+        let isValid = true;
+
+        // Forgot Password form
+        if (email) {
+            if (email.value.trim() === '') {
+                showError(email, 'Email is required.');
+                isValid = false;
+            } else if (!isEmailValid(email.value.trim())) {
+                showError(email, 'Please enter a valid email address.');
+                isValid = false;
+            } else {
+                showSuccess(email);
+            }
+        }
+
+        // Reset Password form
+        if (password) {
+            if (password.value.trim() === '') {
+                showError(password, 'Password is required.');
+                isValid = false;
+            } else if (isPasswordSecure(password.value) === false) {
+                showError(password, 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.');
+                isValid = false;
+            } else {
+                showSuccess(password);
+            }
+        }
+
+        if (cpassword) {
+            if (cpassword.value.trim() === '') {
+                showError(cpassword, 'Please confirm your password.');
+                isValid = false;
+            } else if (password && cpassword.value.trim() !== password.value.trim()) {
+                showError(cpassword, 'Passwords do not match.');
+                isValid = false;
+            } else {
+                showSuccess(cpassword);
+            }
+        }
+
+        return isValid;
+    };
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!validateForm()) {
+            showAlert(alertTypes.Danger, 'Please fix the errors in the form before submitting.');
+        } else {
+            if (email) submitForgotPassword(form);
+            else submitResetPassword(form);
+        }
+    });
+
+    form.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', () => {
+            if (input.classList.contains('input-error')) {
+                validateForm();
+            }
+        });
+    });
+}
+
+function submitForgotPassword(form) {
+    const formData = new FormData(form);
+    // console.log(Object.fromEntries(formData.entries()));
+    fetch('/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.fromEntries(formData.entries()))  
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showAlert(alertTypes.Success, data.message || 'Password reset link sent to your email.');
+            window.location.href = '/auth/login';
+        } else {
+            showAlert(alertTypes.Danger, data.message || 'Failed to send reset link. Please try again.');
+        }
+    })
+    .catch(err => {
+        console.error('Error during forgot password:', err);
+        showAlert(alertTypes.Danger, 'An error occurred. Please try again later.');
+    });
+}
+
+function submitResetPassword(form) {
+    const formData = new FormData(form);
+    // console.log(Object.fromEntries(formData.entries()));
+    let token = window.resetToken;
+    if (!token) {
+        showAlert(alertTypes.Danger, 'Invalid or missing token. Please try again.');
+        return;
+    }
+    fetch(`/auth/reset-password/${token}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.fromEntries(formData.entries()))  
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showAlert(alertTypes.Success, data.message || 'Password has been reset successfully.');
+            setTimeout(() => {
+                window.location.href = '/auth/login';
+            }, 2000);
+        } else {
+            showAlert(alertTypes.Danger, data.message || 'Failed to reset password. Please try again.');
+        }
+    })
+    .catch(err => {
+        console.error('Error during reset password:', err);
+        showAlert(alertTypes.Danger, 'An error occurred. Please try again later.');
+    });
+}
+
+
+
+
 
 // Function to handle the donation form submission
 function validateDonationForm(donationForm, action) {
     console.log('Donation form found');
 
-    const donationImages = donationForm.querySelector('[name="images[]"]');
+    const donationImages = donationForm.querySelector('[name="donation[images[]]"]');
 
     const showError = (input, message) => {
         const formGroup = input.closest('div');
@@ -481,16 +650,18 @@ function validateDonationForm(donationForm, action) {
     };
 
     const isEmailValid = email =>
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email.trim());
+        /^[a-zA-Z0-9._&-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email.trim());
 
     const isPhoneValid = phone => /^\d{10}$/.test(phone.trim());
+
+    const isPincodeValid = pincode => /^\d{6}$/.test(pincode.trim());
 
     const validateForm = () => {
         let isValid = true;
 
         const requiredFields = [
-            'title', 'source', 'numberOfPeopleFed', 'address', 'city',
-            'state', 'personName', 'contact', 'email'
+            'donation[title]', 'donation[source]', 'donation[numberOfPeopleFed]', 'donation[address]', 'donation[city]',
+            'donation[state]', 'donation[pincode]', 'donation[personName]', 'donation[contact]', 'donation[email]'
         ];
 
         requiredFields.forEach(name => {
@@ -505,15 +676,21 @@ function validateDonationForm(donationForm, action) {
             }
         });
 
-        const emailInput = donationForm.querySelector('[name="email"]');
+        const emailInput = donationForm.querySelector('[name="donation[email]"]');
         if (emailInput && emailInput.value && !isEmailValid(emailInput.value)) {
             showError(emailInput, 'Invalid email address.');
             isValid = false;
         }
 
-        const phoneInput = donationForm.querySelector('[name="contact"]');
+        const phoneInput = donationForm.querySelector('[name="donation[contact]"]');
         if (phoneInput && phoneInput.value && !isPhoneValid(phoneInput.value)) {
             showError(phoneInput, 'Enter a valid 10-digit contact number.');
+            isValid = false;
+        }
+
+        const pincodeInput = donationForm.querySelector('[name="donation[pincode]"]');
+        if (pincodeInput && pincodeInput.value && !isPincodeValid(pincodeInput.value)) {
+            showError(pincodeInput, 'Enter a valid 6-digit pincode.');
             isValid = false;
         }
 
@@ -560,13 +737,13 @@ function validateDonationForm(donationForm, action) {
 
 function handleSubmitFoodDonataionForm(e, donationForm, action) {
     const formData = new FormData(donationForm);
-    const donationImageFiles = donationForm.querySelector('input[name="images[]"]').files;
+    const donationImageFiles = donationForm.querySelector('input[name="donation[images[]]"]').files;
     let path = "";
     if (action === 'new') {
-        path = "/donations/new";
+        path = "/donations/";
     }
     else if (action === 'edit') {
-        path = `/donations/${formData.get('donationId')}/edit`;
+        path = `/donations/${formData.get('donationId')}?_method=PUT`;
     }
 
     // Append each food item as nested fields
@@ -604,14 +781,14 @@ function handleSubmitFoodDonataionForm(e, donationForm, action) {
             // If editing and new images selected, append old images if any
             const oldDonationImages = window.oldDonationImages || [];
             oldDonationImages.forEach((image, i) => {
-                formData.append(`oldDonationImages[${i}]`, image);
+                formData.append(`donation[oldDonationImages][${i}]`, image);
             });
         }
         else {
             // If editing and no new images, append old images as donation images if any
             const oldDonationImages = window.oldDonationImages || [];
             oldDonationImages.forEach((image, i) => {
-                formData.append(`donationImages[${i}]`, image);
+                formData.append(`donation[images][${i}]`, image);
             });
         }
     }
@@ -653,16 +830,16 @@ function handleSubmitFoodDonataionForm(e, donationForm, action) {
 
 // Function to validate the item form
 function validateItemForm(form, action) {
-    const name = form.querySelector('[name="name"]');
-    const quantity = form.querySelector('[name="quantity"]');
-    const unit = form.querySelector('[name="unit"]');
-    const type = form.querySelector('[name="type"]');
-    const condition = form.querySelector('[name="condition"]');
-    const expiryDate = form.querySelector('[name="expiryDate"]');
-    const expiryTime = form.querySelector('[name="expiryTime"]');
-    const cookedDate = form.querySelector('[name="cookedDate"]');
-    const cookedTime = form.querySelector('[name="cookedTime"]');
-    const itemImages = form.querySelector('[name="itemImages[]"]');
+    const name = form.querySelector('[name="item[name]"]');
+    const quantity = form.querySelector('[name="item[quantity]"]');
+    const unit = form.querySelector('[name="item[unit]"]');
+    const type = form.querySelector('[name="item[type]"]');
+    const condition = form.querySelector('[name="item[condition]"]');
+    const expiryDate = form.querySelector('[name="item[expiryDate]"]');
+    const expiryTime = form.querySelector('[name="item[expiryTime]"]');
+    const cookedDate = form.querySelector('[name="item[cookedDate]"]');
+    const cookedTime = form.querySelector('[name="item[cookedTime]"]');
+    const itemImages = form.querySelector('[name="item[images[]]"]');
 
     const showError = (input, message) => {
         const formGroup = input.closest('.mb-4') || input.parentElement;
@@ -796,9 +973,21 @@ function handleNewFoodItem(event) {
     }
 
     const formData = new FormData(itemForm);
-    let itemDetails = Object.fromEntries(formData.entries());
-    itemDetails['itemImages'] = selectedItemImages;
-    const imageFiles = itemForm.querySelector('input[name="itemImages[]"]').files;
+    let rawDetails = Object.fromEntries(formData.entries());
+    let itemDetails = {
+        name: rawDetails['item[name]'],
+        quantity: rawDetails['item[quantity]'],
+        unit: rawDetails['item[unit]'],
+        type: rawDetails['item[type]'],
+        condition: rawDetails['item[condition]'],
+        expiryDate: rawDetails['item[expiryDate]'],
+        expiryTime: rawDetails['item[expiryTime]'],
+        cookedDate: rawDetails['item[cookedDate]'],
+        cookedTime: rawDetails['item[cookedTime]'],
+        // images handled separately
+    };
+    itemDetails.itemImages = selectedItemImages;
+    const imageFiles = itemForm.querySelector('input[name="item[images[]]"]').files;
     itemDetails.itemImageFiles = Array.from(imageFiles); // store File objects, not blob URLs
     foodItems.push(itemDetails);
     // console.log(itemDetails);
@@ -864,15 +1053,27 @@ function handleTableInsert() {
 // Function to handle the edit food item form submission
 function handleEditFoodItem(event) {
     event.preventDefault(); // Prevent the form from submitting normally
+    console.log('Editing item...');
 
     const form = event.target;
     const itemIndex = parseInt(form.dataset.index); // Get the index of the item being edited
-    let updatedItem = Object.fromEntries(new FormData(form).entries());
+    let rawDetails = Object.fromEntries(new FormData(form).entries());
+    let updatedItem = {
+        name: rawDetails['item[name]'],
+        quantity: rawDetails['item[quantity]'],
+        unit: rawDetails['item[unit]'],
+        type: rawDetails['item[type]'],
+        condition: rawDetails['item[condition]'],
+        expiryDate: rawDetails['item[expiryDate]'],
+        expiryTime: rawDetails['item[expiryTime]'],
+        cookedDate: rawDetails['item[cookedDate]'],
+        cookedTime: rawDetails['item[cookedTime]'],
+        // images handled separately
+    };
 
-    const imageFiles = form.querySelector('input[name="itemImages[]"]').files;
+    const imageFiles = form.querySelector('input[name="item[images[]]"]').files;
     if (imageFiles.length === 0) {
         updatedItem['itemImages'] = foodItems[itemIndex].itemImages; // Keep existing images if no new ones
-        updatedItem['itemImageFiles'] = foodItems[itemIndex].itemImageFiles; // Keep existing files
     }
     else {
         updatedItem['itemImages'] = selectedItemImages;
@@ -884,7 +1085,9 @@ function handleEditFoodItem(event) {
 
     // Update the table row
     const itemsTable = document.getElementById('itemsTable');
+    console.log(itemsTable);
     const row = itemsTable.rows[itemIndex + 1]; // Adjust for header row
+    console.log(updatedItem);
 
     row.cells[1].innerText = updatedItem.name;
     row.cells[2].innerText = updatedItem.type;
@@ -969,7 +1172,6 @@ function validateRequestDonationForm(form) {
 async function submitRequestDonationForm(form) {
     const donationId = document.getElementById("donationId").value;
     const donorId = document.getElementById("donorId").value;
-    const ngoId = document.getElementById("ngoId").value;
     const message = document.getElementById("message").value;
 
     try {
@@ -979,7 +1181,7 @@ async function submitRequestDonationForm(form) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ donationId, donorId, ngoId, message })
+            body: JSON.stringify({ donationId, donorId, message })
         });
 
         const result = await response.json();

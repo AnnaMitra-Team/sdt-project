@@ -1,4 +1,3 @@
-
 window.foodItems = window.foodItems || [];
 let imagesModalURLs = [];
 let imagesModalIndex = 0;
@@ -6,6 +5,58 @@ let imagesModalIndex = 0;
 document.addEventListener('DOMContentLoaded', (e) => {
 
     console.log('listeners loaded');
+
+    //  ==========================  Common JS  ============================
+
+    const notificationToggle = document.getElementById('notificationsToggler');
+    if (notificationToggle) {
+        // turn on notification if input is checked otherwise turn off 
+        notificationToggle.addEventListener('change', function (event) {
+            const isEnabled = event.target.checked;
+            // if notifications enabled, request permission from browser else disable notifications permission
+            if (isEnabled) {
+                if (Notification.permission !== 'granted') {
+                    Notification.requestPermission().then(function (permission) {
+                        if (permission === 'granted') {
+                            showAlert(alertTypes.Success, 'Notification permission granted.');
+                        } else {
+                            showAlert(alertTypes.Warning, 'Notification permission denied. You will not receive notifications.');
+                            notificationToggle.checked = false; // revert toggle state
+                            return;
+                        }
+                    });
+                }
+            } else {
+                // No direct way to revoke permission, just inform user
+                showAlert(alertTypes.Info, 'To completely disable notifications, please change permissions in your browser settings.');
+            }
+            
+            const role = window.user ? window.user.role.toLowerCase() : null;
+            fetch(`/${role}/toggle-notifications`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ enabled: isEnabled })
+            })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.success) {
+                    showAlert(alertTypes.Success, `Notifications ${isEnabled ? 'enabled' : 'disabled'} successfully.`);
+                } else {
+                    showAlert(alertTypes.Danger, `Failed to ${isEnabled ? 'enable' : 'disable'} notifications. Please try again.`);
+                    notificationToggle.checked = !isEnabled; // revert toggle state
+                }
+            })
+            .catch((err) => {
+                showAlert(alertTypes.Danger, `An error occurred. Please try again.`);
+                console.error('Notification toggle error:', err);
+                notificationToggle.checked = !isEnabled; // revert toggle state
+            });
+        });
+    }
+
+
 
     //  ==========================  Login page JS  ============================
 
@@ -47,7 +98,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
                 handleOpenEditFoodItemModal(event);
             }
             if (event.target.classList.contains('hover-blue')) {
-                handleOpenImagesModal(event);
+                handleOpenImagesModal(event, 'item-table');
             }
         });
     }
@@ -118,11 +169,20 @@ document.addEventListener('DOMContentLoaded', (e) => {
 
 
     //  ==========================  All Donations page JS  ============================
+
     const searchTitleDesc = document.getElementById('searchTitleDesc');
     if (searchTitleDesc) {
         console.log('search filters initialized');
         setDonationFilters();
     }
+
+
+
+
+
+    //  ==========================  Donor dashboard page JS  ============================
+
+
 
 });
 
@@ -206,25 +266,25 @@ function handleOpenEditFoodItemModal(event) {
     const form = document.getElementById('editItemForm');
 
     // Fill the input fields
-    form.elements['name'].value = item.name || '';
-    form.elements['quantity'].value = item.quantity || '';
-    form.elements['unit'].value = item.unit || '';
-    form.elements['type'].value = item.type || '';
-    form.elements['condition'].value = item.condition || '';
+    form.elements['item[name]'].value = item.name || '';
+    form.elements['item[quantity]'].value = item.quantity || '';
+    form.elements['item[unit]'].value = item.unit || '';
+    form.elements['item[type]'].value = item.type || '';
+    form.elements['item[condition]'].value = item.condition || '';
 
     // Expiry
     if (item.expiryDate && item.expiryDate.length > 10) {
         item.expiryDate = item.expiryDate.slice(0, 10); // Ensure date is in YYYY-MM-DD format
     }
-    form.elements['expiryDate'].value = item.expiryDate || '';
-    form.elements['expiryTime'].value = item.expiryTime || '';
+    form.elements['item[expiryDate]'].value = item.expiryDate || '';
+    form.elements['item[expiryTime]'].value = item.expiryTime || '';
 
     // Cooked
     if (item.cookedDate && item.cookedDate.length > 10) {
         item.cookedDate = item.cookedDate.slice(0, 10); // Ensure date is in YYYY-MM-DD format
     }
-    form.elements['cookedDate'].value = item.cookedDate || '';
-    form.elements['cookedTime'].value = item.cookedTime || '';
+    form.elements['item[cookedDate]'].value = item.cookedDate || '';
+    form.elements['item[cookedTime]'].value = item.cookedTime || '';
 
     // Clear preview area first
     const previewContainer = form.querySelector('.imagesPreview');
@@ -247,14 +307,22 @@ function handleOpenEditFoodItemModal(event) {
 }
 
 // Function to open the image modal and display images
-function handleOpenImagesModal(event) {
+function handleOpenImagesModal(event, tableType) {
     const nextImageBtn = document.getElementById('nextImage');
     const prevImageBtn = document.getElementById('prevImage');
     const viewerImage = document.getElementById('viewerImage');
     let ind = event.target.closest('tr').rowIndex - 1;
 
+    if (tableType === 'donation-table') {
+        imagesModalURLs = donationItems[ind]['images'];
+    }
+    else if(tableType === 'donation-completion'){
+        imagesModalURLs = completionImages;
+    }
+    else {
+        imagesModalURLs = foodItems[ind]['itemImages'];
+    }
 
-    imagesModalURLs = foodItems[ind]['itemImages'];
     imagesModalIndex = 0;
     viewerImage.src = imagesModalURLs[imagesModalIndex];
     if (imagesModalURLs.length === 1) {
@@ -279,8 +347,8 @@ function handleGetCurrentLocation() {
                 marker.setLatLng([lat, lng]);
                 map.setView([lat, lng], 15);
                 updateAddress(lat, lng);
-                document.querySelector("input[name='latitude']").value = lat;
-                document.querySelector("input[name='longitude']").value = lng;
+                document.querySelector("input[name='donation[latitude]']").value = lat;
+                document.querySelector("input[name='donation[longitude]']").value = lng;
             },
             function (error) {
                 switch (error.code) {
@@ -317,8 +385,8 @@ function handleSetCityLocation(event) {
                 const lat = parseFloat(data[0].lat);
                 const lon = parseFloat(data[0].lon);
                 // console.log(`Coordinates for ${cityName}:`, lat, lon);
-                document.querySelector("input[name='latitude']").value = lat;
-                document.querySelector("input[name='longitude']").value = lon;
+                document.querySelector("input[name='donation[latitude]']").value = lat;
+                document.querySelector("input[name='donation[longitude]']").value = lon;
                 map.setView([lat, lon], 12);
                 marker.setLatLng([lat, lon]);
                 updateAddress(lat, lon);
