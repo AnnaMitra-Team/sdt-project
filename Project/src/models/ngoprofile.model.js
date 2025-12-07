@@ -7,6 +7,7 @@ const ngoProfileSchema = new mongoose.Schema({
     registeredUnder: { type: String, required: true, trim: true },
     profilePicture: { type: String },
     languagePreference: { type: String, default: "en" },
+    notificationsEnabled: { type: Boolean, default: true },
     bannerPicture: { type: String },
     website: { type: String },
     address: { type: String, maxlength: 300, required: true, trim: true },

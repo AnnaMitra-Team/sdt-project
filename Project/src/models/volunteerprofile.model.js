@@ -6,6 +6,7 @@ const volunteerProfileSchema = new mongoose.Schema({
     lastName: { type: String, required: true, trim: true },
     profilePicture: { type: String },
     languagePreference: { type: String, default: "en" },
+    notificationsEnabled: { type: Boolean, default: true },
     isAvailable: { type: Boolean, default: true },
     about: { type: String, maxlength: 1000 },
     address: { type: String, maxlength: 300, required: true, trim: true },

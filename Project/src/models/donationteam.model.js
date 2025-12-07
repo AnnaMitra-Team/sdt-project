@@ -9,11 +9,12 @@ const donationTeamSchema = new mongoose.Schema({
     },
     deliverySchedule: {
         date: { type: Date, required: false },
-        time: { type: String, required: false }
+        time: { type: String, required: false },
+        location: { type: String, required: false }
     },
     volunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
-    leaderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    completionProof: [{ type: String, required: true, default: [] }]
+    leaderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    completionProof: [{ type: String, default: [] }]
 }, {
     timestamps: true // adds createdAt and updatedAt
 });

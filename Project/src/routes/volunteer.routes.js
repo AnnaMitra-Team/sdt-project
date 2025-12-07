@@ -1,13 +1,30 @@
 const express = require('express');
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 const router = express.Router();
 const volunteerController = require('../controllers/volunteer.controller');
+const volunteerMiddleware = require('../middlewares/volunteer.middleware');
 const { isLoggedIn, isVolunteer } = require('../middlewares/auth.middleware');
 
+const storage = multer.diskStorage({
+    destination: 'public/images/volunteers',
+    filename: (req, file, cb) => {
+        cb(null, file.fieldname + '-' + uuidv4() + '.' + file.originalname.split('.').pop());
+    }
+});
+const upload = multer({ storage });
+
 // All routes here require user to be logged in and to be a volunteer
-router.use(isLoggedIn, isVolunteer);
+router.use(isLoggedIn);
+
+// All routes here require user to be a volunteer
+router.use(isVolunteer);
 
 // Dashboard Route
 router.get('/', volunteerController.renderDashboardPage);
+
+// Update Profile Route
+router.put('/', upload.single('profileImage'), volunteerMiddleware.validateVolunteerProfile, volunteerController.updateVolunteerProfile);
 
 // Assigned Tasks Route
 router.get('/assigned-tasks', volunteerController.renderAssignedTasksPage);
@@ -24,11 +41,14 @@ router.get('/ngos', volunteerController.renderNgosPage);
 // Joined NGOs Route
 router.get('/joined-ngos', volunteerController.renderJoinedNgosPage);
 
-// Specific NGO Details Route
-router.get('/ngos/:id', volunteerController.renderNgoDetailsPage);
-
 // Manage Account Route
 router.get('/account', volunteerController.renderManageAccountPage);
+
+// Toggle Notifications Route
+router.post('/toggle-notifications', volunteerController.toggleVolunteerNotifications);
+
+// Toggle Availability Route
+router.post('/toggle-availability', volunteerController.toggleVolunteerAvailability);
 
 
 module.exports = router;

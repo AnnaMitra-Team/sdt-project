@@ -1,387 +1,389 @@
+const axios = require("axios");
+
 
 testSeed = async (req, res) => {
-    // try {
-    //     const user = await User.findOne({ email: '202412021@daiict.ac.in' });
-    //     if (user) {
-    //         const pass = "MyPass@123";
-    //         const salt = await bcrypt.genSalt(10);
-    //         const passwordHash = await bcrypt.hash(pass, salt);
+  // try {
+  //     const user = await User.findOne({ email: '202412021@daiict.ac.in' });
+  //     if (user) {
+  //         const pass = "MyPass@123";
+  //         const salt = await bcrypt.genSalt(10);
+  //         const passwordHash = await bcrypt.hash(pass, salt);
 
-    //         user.passwordHash = passwordHash;
-    //         await user.save();
-    //         res.json({ message: 'Password updated successfully', user });
-    //     }
-    //     else {
-    //         res.status(404).json({ error: 'User not found' });
-    //     }
-    // } catch (error) {
-    //     console.error('Error in testRoute:', error.message);
-    //     res.status(500).json({ error: 'Internal server error' });
-    // }
+  //         user.passwordHash = passwordHash;
+  //         await user.save();
+  //         res.json({ message: 'Password updated successfully', user });
+  //     }
+  //     else {
+  //         res.status(404).json({ error: 'User not found' });
+  //     }
+  // } catch (error) {
+  //     console.error('Error in testRoute:', error.message);
+  //     res.status(500).json({ error: 'Internal server error' });
+  // }
 
-    // const pass = "MyPass@123";
-    // try {
-    //     const users = await User.findOne({ email: '202412021@daiict.ac.in' }, {_id:0, passwordHash:1});
-    //     if (users && users.passwordHash) {
-    //         console.log('User found:', users);
-    //         const isMatch = await bcrypt.compare(pass, users.passwordHash);
-    //         res.json({ passwordMatch: isMatch });
-    //     } else {
-    //         res.json({ error: 'User not found or password hash missing' });
-    //     }
-    // }
-    // catch(err) {
-    //     console.log(err.message);
-    // }
+  // const pass = "MyPass@123";
+  // try {
+  //     const users = await User.findOne({ email: '202412021@daiict.ac.in' }, {_id:0, passwordHash:1});
+  //     if (users && users.passwordHash) {
+  //         console.log('User found:', users);
+  //         const isMatch = await bcrypt.compare(pass, users.passwordHash);
+  //         res.json({ passwordMatch: isMatch });
+  //     } else {
+  //         res.json({ error: 'User not found or password hash missing' });
+  //     }
+  // }
+  // catch(err) {
+  //     console.log(err.message);
+  // }
 
-    // try {
-    //     // Sample realistic NGO users
-    //     const sampleUsers = [
-    //         { firstName: 'Helping', lastName: 'Hands', email: 'contact@helpinghands.org', contact: '9811112233', address: '12 MG Road, Bengaluru, Karnataka', password: 'Help@1234' },
-    //         { firstName: 'Food', lastName: 'ForAll', email: 'info@foodforall.org', contact: '9822223344', address: '88 Park Street, Kolkata, West Bengal', password: 'Food#2025' },
-    //         { firstName: 'Care', lastName: 'Trust', email: 'support@caretrust.org', contact: '9833334455', address: '56 Anna Salai, Chennai, Tamil Nadu', password: 'Care@999' },
-    //         { firstName: 'Green', lastName: 'Hope', email: 'hello@greenhope.org', contact: '9844445566', address: '22 Ashram Road, Ahmedabad, Gujarat', password: 'GreenHope1!' },
-    //         { firstName: 'Smile', lastName: 'Foundation', email: 'contact@smilefoundation.org', contact: '9855556677', address: '15 Connaught Place, New Delhi', password: 'Smile#Help' },
-    //         { firstName: 'Bright', lastName: 'Future', email: 'team@brightfuture.org', contact: '9866667788', address: '34 Jubilee Hills, Hyderabad, Telangana', password: 'Bright@2025' },
-    //         { firstName: 'Seva', lastName: 'Trust', email: 'info@sevatrust.org', contact: '9877778899', address: '78 MG Marg, Thiruvananthapuram, Kerala', password: 'Seva$Life' },
-    //         { firstName: 'Hope', lastName: 'Charity', email: 'contact@hopecharity.org', contact: '9888889900', address: '90 Civil Lines, Jaipur, Rajasthan', password: 'Hope_Charity' },
-    //         { firstName: 'Food', lastName: 'Relief', email: 'relief@foodrelief.org', contact: '9899990011', address: '5 Salt Lake, Kolkata, West Bengal', password: 'FoodRelief@1' },
-    //         { firstName: 'Serve', lastName: 'Nation', email: 'team@servenation.org', contact: '9800001122', address: '11 Park Street, Pune, Maharashtra', password: 'Serve!2023' },
-    //         { firstName: 'Helping', lastName: 'Hearts', email: 'help@helpinghearts.org', contact: '9810101234', address: '50 MG Road, Indore, Madhya Pradesh', password: 'Hearts@456' },
-    //         { firstName: 'Food', lastName: 'Smile', email: 'info@foodsmile.org', contact: '9820202345', address: '99 Nehru Place, New Delhi', password: 'FoodSmile#1' },
-    //         { firstName: 'Life', lastName: 'Saver', email: 'lifesaver@ngo.org', contact: '9830303456', address: '24 Baner Road, Pune, Maharashtra', password: 'LifeSaver_22' },
-    //         { firstName: 'Annapurna', lastName: 'Trust', email: 'info@annapurnatrust.org', contact: '9840404567', address: '16 Residency Road, Mumbai, Maharashtra', password: 'Anna@Trust1' },
-    //         { firstName: 'Hunger', lastName: 'Free', email: 'team@hungerfree.org', contact: '9850505678', address: '7 Sector 17, Chandigarh', password: 'HungerFree@2' }
-    //     ];
+  // try {
+  //     // Sample realistic NGO users
+  //     const sampleUsers = [
+  //         { firstName: 'Helping', lastName: 'Hands', email: 'contact@helpinghands.org', contact: '9811112233', address: '12 MG Road, Bengaluru, Karnataka', password: 'Help@1234' },
+  //         { firstName: 'Food', lastName: 'ForAll', email: 'info@foodforall.org', contact: '9822223344', address: '88 Park Street, Kolkata, West Bengal', password: 'Food#2025' },
+  //         { firstName: 'Care', lastName: 'Trust', email: 'support@caretrust.org', contact: '9833334455', address: '56 Anna Salai, Chennai, Tamil Nadu', password: 'Care@999' },
+  //         { firstName: 'Green', lastName: 'Hope', email: 'hello@greenhope.org', contact: '9844445566', address: '22 Ashram Road, Ahmedabad, Gujarat', password: 'GreenHope1!' },
+  //         { firstName: 'Smile', lastName: 'Foundation', email: 'contact@smilefoundation.org', contact: '9855556677', address: '15 Connaught Place, New Delhi', password: 'Smile#Help' },
+  //         { firstName: 'Bright', lastName: 'Future', email: 'team@brightfuture.org', contact: '9866667788', address: '34 Jubilee Hills, Hyderabad, Telangana', password: 'Bright@2025' },
+  //         { firstName: 'Seva', lastName: 'Trust', email: 'info@sevatrust.org', contact: '9877778899', address: '78 MG Marg, Thiruvananthapuram, Kerala', password: 'Seva$Life' },
+  //         { firstName: 'Hope', lastName: 'Charity', email: 'contact@hopecharity.org', contact: '9888889900', address: '90 Civil Lines, Jaipur, Rajasthan', password: 'Hope_Charity' },
+  //         { firstName: 'Food', lastName: 'Relief', email: 'relief@foodrelief.org', contact: '9899990011', address: '5 Salt Lake, Kolkata, West Bengal', password: 'FoodRelief@1' },
+  //         { firstName: 'Serve', lastName: 'Nation', email: 'team@servenation.org', contact: '9800001122', address: '11 Park Street, Pune, Maharashtra', password: 'Serve!2023' },
+  //         { firstName: 'Helping', lastName: 'Hearts', email: 'help@helpinghearts.org', contact: '9810101234', address: '50 MG Road, Indore, Madhya Pradesh', password: 'Hearts@456' },
+  //         { firstName: 'Food', lastName: 'Smile', email: 'info@foodsmile.org', contact: '9820202345', address: '99 Nehru Place, New Delhi', password: 'FoodSmile#1' },
+  //         { firstName: 'Life', lastName: 'Saver', email: 'lifesaver@ngo.org', contact: '9830303456', address: '24 Baner Road, Pune, Maharashtra', password: 'LifeSaver_22' },
+  //         { firstName: 'Annapurna', lastName: 'Trust', email: 'info@annapurnatrust.org', contact: '9840404567', address: '16 Residency Road, Mumbai, Maharashtra', password: 'Anna@Trust1' },
+  //         { firstName: 'Hunger', lastName: 'Free', email: 'team@hungerfree.org', contact: '9850505678', address: '7 Sector 17, Chandigarh', password: 'HungerFree@2' }
+  //     ];
 
-    //     // Hash passwords & add NGO role
-    //     const usersWithHash = await Promise.all(
-    //         sampleUsers.map(async user => ({
-    //             ...user,
-    //             role: 'NGO',
-    //             passwordHash: await bcrypt.hash(user.password, 10),
-    //             password: undefined
-    //         }))
-    //     );
+  //     // Hash passwords & add NGO role
+  //     const usersWithHash = await Promise.all(
+  //         sampleUsers.map(async user => ({
+  //             ...user,
+  //             role: 'NGO',
+  //             passwordHash: await bcrypt.hash(user.password, 10),
+  //             password: undefined
+  //         }))
+  //     );
 
-    //     // Insert into DB
-    //     const u = await User.insertMany(usersWithHash);
-    //     console.log(u);
+  //     // Insert into DB
+  //     const u = await User.insertMany(usersWithHash);
+  //     console.log(u);
 
-    //     console.log('15 NGO users inserted successfully');
-    //     res.send('15 NGO users inserted successfully');
-    // } catch (error) {
-    //     console.error('Error inserting NGO users:', error);
-    //     res.status(500).send('Failed to insert NGO users');
-    // }
+  //     console.log('15 NGO users inserted successfully');
+  //     res.send('15 NGO users inserted successfully');
+  // } catch (error) {
+  //     console.error('Error inserting NGO users:', error);
+  //     res.status(500).send('Failed to insert NGO users');
+  // }
 
-    // try {
-    //   const salt = await bcrypt.genSalt(10);
-  
-    //   const volunteersData = [
-    //     {
-    //       firstName: "Amit",
-    //       lastName: "Sharma",
-    //       email: "amit.sharma01@example.com",
-    //       contact: "9876543210",
-    //       role: "Volunteer",
-    //       address: "201 Green Residency, Pune, Maharashtra",
-    //       password: "Amit@1234"
-    //     },
-    //     {
-    //       firstName: "Sneha",
-    //       lastName: "Patil",
-    //       email: "sneha.patil02@example.com",
-    //       contact: "9123456780",
-    //       role: "Volunteer",
-    //       address: "12 Orchid Apartments, Andheri East, Mumbai",
-    //       password: "Sneha#456"
-    //     },
-    //     {
-    //       firstName: "Rohit",
-    //       lastName: "Verma",
-    //       email: "rohit.verma03@example.com",
-    //       contact: "9988776655",
-    //       role: "Volunteer",
-    //       address: "4 Sunrise Tower, Salt Lake, Kolkata",
-    //       password: "Rohit$2024"
-    //     },
-    //     {
-    //       firstName: "Priya",
-    //       lastName: "Nair",
-    //       email: "priya.nair04@example.com",
-    //       contact: "9765432109",
-    //       role: "Volunteer",
-    //       address: "56 Lake View Villa, Kochi, Kerala",
-    //       password: "Priya*890"
-    //     },
-    //     {
-    //       firstName: "Karan",
-    //       lastName: "Gupta",
-    //       email: "karan.gupta05@example.com",
-    //       contact: "9345678901",
-    //       role: "Volunteer",
-    //       address: "10 Park Avenue, Civil Lines, Delhi",
-    //       password: "Karan@990"
-    //     },
-    //     {
-    //       firstName: "Neha",
-    //       lastName: "Reddy",
-    //       email: "neha.reddy06@example.com",
-    //       contact: "9234567810",
-    //       role: "Volunteer",
-    //       address: "88 Rosewood Heights, Hyderabad",
-    //       password: "Neha#7722"
-    //     },
-    //     {
-    //       firstName: "Vikram",
-    //       lastName: "Mehta",
-    //       email: "vikram.mehta07@example.com",
-    //       contact: "9012345678",
-    //       role: "Volunteer",
-    //       address: "11 Galaxy Towers, Navrangpura, Ahmedabad",
-    //       password: "Vikram!2025"
-    //     },
-    //     {
-    //       firstName: "Ayesha",
-    //       lastName: "Khan",
-    //       email: "ayesha.khan08@example.com",
-    //       contact: "9098765432",
-    //       role: "Volunteer",
-    //       address: "Sunflower Enclave, Bandra West, Mumbai",
-    //       password: "Ayesha@55"
-    //     },
-    //     {
-    //       firstName: "Manish",
-    //       lastName: "Joshi",
-    //       email: "manish.joshi09@example.com",
-    //       contact: "9345098765",
-    //       role: "Volunteer",
-    //       address: "Hilltop Residency, Jaipur, Rajasthan",
-    //       password: "Manish#778"
-    //     },
-    //     {
-    //       firstName: "Divya",
-    //       lastName: "Iyer",
-    //       email: "divya.iyer10@example.com",
-    //       contact: "9445567890",
-    //       role: "Volunteer",
-    //       address: "Skyline Apartments, Thiruvananthapuram, Kerala",
-    //       password: "Divya*1010"
-    //     },
-    //     {
-    //       firstName: "Rakesh",
-    //       lastName: "Mishra",
-    //       email: "rakesh.mishra11@example.com",
-    //       contact: "9654321780",
-    //       role: "Volunteer",
-    //       address: "Garden Homes, Lucknow, Uttar Pradesh",
-    //       password: "Rakesh@889"
-    //     },
-    //     {
-    //       firstName: "Anjali",
-    //       lastName: "Desai",
-    //       email: "anjali.desai12@example.com",
-    //       contact: "9753186420",
-    //       role: "Volunteer",
-    //       address: "Spring Field, Baroda, Gujarat",
-    //       password: "Anjali#982"
-    //     },
-    //     {
-    //       firstName: "Siddharth",
-    //       lastName: "Kapoor",
-    //       email: "siddharth.kapoor13@example.com",
-    //       contact: "9812345609",
-    //       role: "Volunteer",
-    //       address: "Lotus Residency, Bhopal, Madhya Pradesh",
-    //       password: "Sid@321"
-    //     },
-    //     {
-    //       firstName: "Meena",
-    //       lastName: "Choudhary",
-    //       email: "meena.choudhary14@example.com",
-    //       contact: "9021345678",
-    //       role: "Volunteer",
-    //       address: "Blue Hills, Nagpur, Maharashtra",
-    //       password: "Meena#143"
-    //     },
-    //     {
-    //       firstName: "Nikhil",
-    //       lastName: "Arora",
-    //       email: "nikhil.arora15@example.com",
-    //       contact: "9305678912",
-    //       role: "Volunteer",
-    //       address: "Palm Springs, Chandigarh",
-    //       password: "Nikhil@909"
-    //     },
-    //     {
-    //       firstName: "Shweta",
-    //       lastName: "Singh",
-    //       email: "shweta.singh16@example.com",
-    //       contact: "9172638490",
-    //       role: "Volunteer",
-    //       address: "Central Plaza, Indore, Madhya Pradesh",
-    //       password: "Shweta#786"
-    //     },
-    //     {
-    //       firstName: "Rajesh",
-    //       lastName: "Thakur",
-    //       email: "rajesh.thakur17@example.com",
-    //       contact: "9645281730",
-    //       role: "Volunteer",
-    //       address: "City Heights, Dehradun, Uttarakhand",
-    //       password: "Rajesh@555"
-    //     },
-    //     {
-    //       firstName: "Pooja",
-    //       lastName: "Malhotra",
-    //       email: "pooja.malhotra18@example.com",
-    //       contact: "9345678120",
-    //       role: "Volunteer",
-    //       address: "Orchid Homes, Ludhiana, Punjab",
-    //       password: "Pooja*777"
-    //     },
-    //     {
-    //       firstName: "Aditya",
-    //       lastName: "Rana",
-    //       email: "aditya.rana19@example.com",
-    //       contact: "9012837465",
-    //       role: "Volunteer",
-    //       address: "Victory Apartments, Shimla, Himachal Pradesh",
-    //       password: "Adi#1998"
-    //     },
-    //     {
-    //       firstName: "Kavita",
-    //       lastName: "Bose",
-    //       email: "kavita.bose20@example.com",
-    //       contact: "9473829102",
-    //       role: "Volunteer",
-    //       address: "Rose Garden Flats, Siliguri, West Bengal",
-    //       password: "Kavita@2025"
-    //     },
-    //     {
-    //       firstName: "Harsh",
-    //       lastName: "Reddy",
-    //       email: "harsh.reddy21@example.com",
-    //       contact: "9012839405",
-    //       role: "Volunteer",
-    //       address: "Maple Residency, Secunderabad, Telangana",
-    //       password: "Harsh#2020"
-    //     },
-    //     {
-    //       firstName: "Sunita",
-    //       lastName: "Yadav",
-    //       email: "sunita.yadav22@example.com",
-    //       contact: "9182736450",
-    //       role: "Volunteer",
-    //       address: "Royal Green Apartments, Gurgaon, Haryana",
-    //       password: "Sunita*123"
-    //     },
-    //     {
-    //       firstName: "Deepak",
-    //       lastName: "Saxena",
-    //       email: "deepak.saxena23@example.com",
-    //       contact: "9364782910",
-    //       role: "Volunteer",
-    //       address: "Riverfront Towers, Varanasi, UP",
-    //       password: "Deepak@888"
-    //     },
-    //     {
-    //       firstName: "Anita",
-    //       lastName: "Kulkarni",
-    //       email: "anita.kulkarni24@example.com",
-    //       contact: "9543218760",
-    //       role: "Volunteer",
-    //       address: "Green Park Colony, Nashik, Maharashtra",
-    //       password: "Anita#909"
-    //     },
-    //     {
-    //       firstName: "Arjun",
-    //       lastName: "Menon",
-    //       email: "arjun.menon25@example.com",
-    //       contact: "9745612390",
-    //       role: "Volunteer",
-    //       address: "Sunset Apartments, Kochi, Kerala",
-    //       password: "Arjun@444"
-    //     },
-    //     {
-    //       firstName: "Preeti",
-    //       lastName: "Garg",
-    //       email: "preeti.garg26@example.com",
-    //       contact: "9654321789",
-    //       role: "Volunteer",
-    //       address: "Lakeview Residency, Kanpur, UP",
-    //       password: "Preeti*222"
-    //     },
-    //     {
-    //       firstName: "Rahul",
-    //       lastName: "Bhatia",
-    //       email: "rahul.bhatia27@example.com",
-    //       contact: "9032156789",
-    //       role: "Volunteer",
-    //       address: "Greenwoods Residency, Amritsar, Punjab",
-    //       password: "Rahul#777"
-    //     },
-    //     {
-    //       firstName: "Sonia",
-    //       lastName: "Aggarwal",
-    //       email: "sonia.aggarwal28@example.com",
-    //       contact: "9234517890",
-    //       role: "Volunteer",
-    //       address: "Hillcrest Apartments, Noida, UP",
-    //       password: "Sonia@1122"
-    //     },
-    //     {
-    //       firstName: "Varun",
-    //       lastName: "Chopra",
-    //       email: "varun.chopra29@example.com",
-    //       contact: "9471826350",
-    //       role: "Volunteer",
-    //       address: "Elite Residency, Faridabad, Haryana",
-    //       password: "Varun#1234"
-    //     },
-    //     {
-    //       firstName: "Ritu",
-    //       lastName: "Mohan",
-    //       email: "ritu.mohan30@example.com",
-    //       contact: "9354782910",
-    //       role: "Volunteer",
-    //       address: "Dream Homes, Patna, Bihar",
-    //       password: "Ritu*555"
-    //     },
-    //   ];
-  
-    //   // Hash passwords
-    //   for (let user of volunteersData) {
-    //     user.passwordHash = await bcrypt.hash(user.password, salt);
-    //     delete user.password;
-    //   }
-  
-    //   // Insert into DB
-    //   const inserted = await User.insertMany(volunteersData);
-  
-    //   res.status(201).json({
-    //     message: "30 Volunteers inserted successfully!",
-    //     users: inserted
-    //   });
-    // } catch (error) {
-    //   console.error("Error inserting volunteers:", error);
-    //   res.status(500).json({ message: "Error inserting volunteers", error });
-    // }
+  // try {
+  //   const salt = await bcrypt.genSalt(10);
+
+  //   const volunteersData = [
+  //     {
+  //       firstName: "Amit",
+  //       lastName: "Sharma",
+  //       email: "amit.sharma01@example.com",
+  //       contact: "9876543210",
+  //       role: "Volunteer",
+  //       address: "201 Green Residency, Pune, Maharashtra",
+  //       password: "Amit@1234"
+  //     },
+  //     {
+  //       firstName: "Sneha",
+  //       lastName: "Patil",
+  //       email: "sneha.patil02@example.com",
+  //       contact: "9123456780",
+  //       role: "Volunteer",
+  //       address: "12 Orchid Apartments, Andheri East, Mumbai",
+  //       password: "Sneha#456"
+  //     },
+  //     {
+  //       firstName: "Rohit",
+  //       lastName: "Verma",
+  //       email: "rohit.verma03@example.com",
+  //       contact: "9988776655",
+  //       role: "Volunteer",
+  //       address: "4 Sunrise Tower, Salt Lake, Kolkata",
+  //       password: "Rohit$2024"
+  //     },
+  //     {
+  //       firstName: "Priya",
+  //       lastName: "Nair",
+  //       email: "priya.nair04@example.com",
+  //       contact: "9765432109",
+  //       role: "Volunteer",
+  //       address: "56 Lake View Villa, Kochi, Kerala",
+  //       password: "Priya*890"
+  //     },
+  //     {
+  //       firstName: "Karan",
+  //       lastName: "Gupta",
+  //       email: "karan.gupta05@example.com",
+  //       contact: "9345678901",
+  //       role: "Volunteer",
+  //       address: "10 Park Avenue, Civil Lines, Delhi",
+  //       password: "Karan@990"
+  //     },
+  //     {
+  //       firstName: "Neha",
+  //       lastName: "Reddy",
+  //       email: "neha.reddy06@example.com",
+  //       contact: "9234567810",
+  //       role: "Volunteer",
+  //       address: "88 Rosewood Heights, Hyderabad",
+  //       password: "Neha#7722"
+  //     },
+  //     {
+  //       firstName: "Vikram",
+  //       lastName: "Mehta",
+  //       email: "vikram.mehta07@example.com",
+  //       contact: "9012345678",
+  //       role: "Volunteer",
+  //       address: "11 Galaxy Towers, Navrangpura, Ahmedabad",
+  //       password: "Vikram!2025"
+  //     },
+  //     {
+  //       firstName: "Ayesha",
+  //       lastName: "Khan",
+  //       email: "ayesha.khan08@example.com",
+  //       contact: "9098765432",
+  //       role: "Volunteer",
+  //       address: "Sunflower Enclave, Bandra West, Mumbai",
+  //       password: "Ayesha@55"
+  //     },
+  //     {
+  //       firstName: "Manish",
+  //       lastName: "Joshi",
+  //       email: "manish.joshi09@example.com",
+  //       contact: "9345098765",
+  //       role: "Volunteer",
+  //       address: "Hilltop Residency, Jaipur, Rajasthan",
+  //       password: "Manish#778"
+  //     },
+  //     {
+  //       firstName: "Divya",
+  //       lastName: "Iyer",
+  //       email: "divya.iyer10@example.com",
+  //       contact: "9445567890",
+  //       role: "Volunteer",
+  //       address: "Skyline Apartments, Thiruvananthapuram, Kerala",
+  //       password: "Divya*1010"
+  //     },
+  //     {
+  //       firstName: "Rakesh",
+  //       lastName: "Mishra",
+  //       email: "rakesh.mishra11@example.com",
+  //       contact: "9654321780",
+  //       role: "Volunteer",
+  //       address: "Garden Homes, Lucknow, Uttar Pradesh",
+  //       password: "Rakesh@889"
+  //     },
+  //     {
+  //       firstName: "Anjali",
+  //       lastName: "Desai",
+  //       email: "anjali.desai12@example.com",
+  //       contact: "9753186420",
+  //       role: "Volunteer",
+  //       address: "Spring Field, Baroda, Gujarat",
+  //       password: "Anjali#982"
+  //     },
+  //     {
+  //       firstName: "Siddharth",
+  //       lastName: "Kapoor",
+  //       email: "siddharth.kapoor13@example.com",
+  //       contact: "9812345609",
+  //       role: "Volunteer",
+  //       address: "Lotus Residency, Bhopal, Madhya Pradesh",
+  //       password: "Sid@321"
+  //     },
+  //     {
+  //       firstName: "Meena",
+  //       lastName: "Choudhary",
+  //       email: "meena.choudhary14@example.com",
+  //       contact: "9021345678",
+  //       role: "Volunteer",
+  //       address: "Blue Hills, Nagpur, Maharashtra",
+  //       password: "Meena#143"
+  //     },
+  //     {
+  //       firstName: "Nikhil",
+  //       lastName: "Arora",
+  //       email: "nikhil.arora15@example.com",
+  //       contact: "9305678912",
+  //       role: "Volunteer",
+  //       address: "Palm Springs, Chandigarh",
+  //       password: "Nikhil@909"
+  //     },
+  //     {
+  //       firstName: "Shweta",
+  //       lastName: "Singh",
+  //       email: "shweta.singh16@example.com",
+  //       contact: "9172638490",
+  //       role: "Volunteer",
+  //       address: "Central Plaza, Indore, Madhya Pradesh",
+  //       password: "Shweta#786"
+  //     },
+  //     {
+  //       firstName: "Rajesh",
+  //       lastName: "Thakur",
+  //       email: "rajesh.thakur17@example.com",
+  //       contact: "9645281730",
+  //       role: "Volunteer",
+  //       address: "City Heights, Dehradun, Uttarakhand",
+  //       password: "Rajesh@555"
+  //     },
+  //     {
+  //       firstName: "Pooja",
+  //       lastName: "Malhotra",
+  //       email: "pooja.malhotra18@example.com",
+  //       contact: "9345678120",
+  //       role: "Volunteer",
+  //       address: "Orchid Homes, Ludhiana, Punjab",
+  //       password: "Pooja*777"
+  //     },
+  //     {
+  //       firstName: "Aditya",
+  //       lastName: "Rana",
+  //       email: "aditya.rana19@example.com",
+  //       contact: "9012837465",
+  //       role: "Volunteer",
+  //       address: "Victory Apartments, Shimla, Himachal Pradesh",
+  //       password: "Adi#1998"
+  //     },
+  //     {
+  //       firstName: "Kavita",
+  //       lastName: "Bose",
+  //       email: "kavita.bose20@example.com",
+  //       contact: "9473829102",
+  //       role: "Volunteer",
+  //       address: "Rose Garden Flats, Siliguri, West Bengal",
+  //       password: "Kavita@2025"
+  //     },
+  //     {
+  //       firstName: "Harsh",
+  //       lastName: "Reddy",
+  //       email: "harsh.reddy21@example.com",
+  //       contact: "9012839405",
+  //       role: "Volunteer",
+  //       address: "Maple Residency, Secunderabad, Telangana",
+  //       password: "Harsh#2020"
+  //     },
+  //     {
+  //       firstName: "Sunita",
+  //       lastName: "Yadav",
+  //       email: "sunita.yadav22@example.com",
+  //       contact: "9182736450",
+  //       role: "Volunteer",
+  //       address: "Royal Green Apartments, Gurgaon, Haryana",
+  //       password: "Sunita*123"
+  //     },
+  //     {
+  //       firstName: "Deepak",
+  //       lastName: "Saxena",
+  //       email: "deepak.saxena23@example.com",
+  //       contact: "9364782910",
+  //       role: "Volunteer",
+  //       address: "Riverfront Towers, Varanasi, UP",
+  //       password: "Deepak@888"
+  //     },
+  //     {
+  //       firstName: "Anita",
+  //       lastName: "Kulkarni",
+  //       email: "anita.kulkarni24@example.com",
+  //       contact: "9543218760",
+  //       role: "Volunteer",
+  //       address: "Green Park Colony, Nashik, Maharashtra",
+  //       password: "Anita#909"
+  //     },
+  //     {
+  //       firstName: "Arjun",
+  //       lastName: "Menon",
+  //       email: "arjun.menon25@example.com",
+  //       contact: "9745612390",
+  //       role: "Volunteer",
+  //       address: "Sunset Apartments, Kochi, Kerala",
+  //       password: "Arjun@444"
+  //     },
+  //     {
+  //       firstName: "Preeti",
+  //       lastName: "Garg",
+  //       email: "preeti.garg26@example.com",
+  //       contact: "9654321789",
+  //       role: "Volunteer",
+  //       address: "Lakeview Residency, Kanpur, UP",
+  //       password: "Preeti*222"
+  //     },
+  //     {
+  //       firstName: "Rahul",
+  //       lastName: "Bhatia",
+  //       email: "rahul.bhatia27@example.com",
+  //       contact: "9032156789",
+  //       role: "Volunteer",
+  //       address: "Greenwoods Residency, Amritsar, Punjab",
+  //       password: "Rahul#777"
+  //     },
+  //     {
+  //       firstName: "Sonia",
+  //       lastName: "Aggarwal",
+  //       email: "sonia.aggarwal28@example.com",
+  //       contact: "9234517890",
+  //       role: "Volunteer",
+  //       address: "Hillcrest Apartments, Noida, UP",
+  //       password: "Sonia@1122"
+  //     },
+  //     {
+  //       firstName: "Varun",
+  //       lastName: "Chopra",
+  //       email: "varun.chopra29@example.com",
+  //       contact: "9471826350",
+  //       role: "Volunteer",
+  //       address: "Elite Residency, Faridabad, Haryana",
+  //       password: "Varun#1234"
+  //     },
+  //     {
+  //       firstName: "Ritu",
+  //       lastName: "Mohan",
+  //       email: "ritu.mohan30@example.com",
+  //       contact: "9354782910",
+  //       role: "Volunteer",
+  //       address: "Dream Homes, Patna, Bihar",
+  //       password: "Ritu*555"
+  //     },
+  //   ];
+
+  //   // Hash passwords
+  //   for (let user of volunteersData) {
+  //     user.passwordHash = await bcrypt.hash(user.password, salt);
+  //     delete user.password;
+  //   }
+
+  //   // Insert into DB
+  //   const inserted = await User.insertMany(volunteersData);
+
+  //   res.status(201).json({
+  //     message: "30 Volunteers inserted successfully!",
+  //     users: inserted
+  //   });
+  // } catch (error) {
+  //   console.error("Error inserting volunteers:", error);
+  //   res.status(500).json({ message: "Error inserting volunteers", error });
+  // }
 
 
-    try {
-        const users = await User.find({role: 'Volunteer'}, {_id:1, firstName: 1});
-        res.json(users);
-        // console.log(users);
+  try {
+    const users = await User.find({ role: 'Volunteer' }, { _id: 1, firstName: 1 });
+    res.json(users);
+    // console.log(users);
 
-        // const donations = await Donation.find({});
-        // res.json(donations);
-    }
-    catch (error) {
-        console.error('Error in testRoute:', error.message);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+    // const donations = await Donation.find({});
+    // res.json(donations);
+  }
+  catch (error) {
+    console.error('Error in testRoute:', error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 }
 
 
@@ -1042,17 +1044,17 @@ const donationsData = [
 ];
 
 const seedDB = async () => {
-    try {
-        // Optional: Clear existing donations before inserting new ones
-        // await Donation.deleteMany({});
-        // console.log("Cleared existing donations.");
+  try {
+    // Optional: Clear existing donations before inserting new ones
+    // await Donation.deleteMany({});
+    // console.log("Cleared existing donations.");
 
-        // Insert the new donation data
-        await Donation.insertMany(donationsData);
-        console.log(`Successfully inserted ${donationsData.length} donation records.`);
-    } catch (error) {
-        console.error("Error seeding the database:", error);
-    }
+    // Insert the new donation data
+    await Donation.insertMany(donationsData);
+    console.log(`Successfully inserted ${donationsData.length} donation records.`);
+  } catch (error) {
+    console.error("Error seeding the database:", error);
+  }
 };
 
 
@@ -1117,3 +1119,72 @@ async function insertRequests() {
     console.error("Error inserting requests:", error);
   }
 }
+
+
+
+
+const BASE_URL = "http://localhost:3000/auth/register";
+const volunteers = [
+  { firstName: "Aarav", lastName: "Shah", city: "Ahmedabad", state: "Gujarat", pincode: "380001" },
+  { firstName: "Isha", lastName: "Patel", city: "Surat", state: "Gujarat", pincode: "395003" },
+  { firstName: "Rohan", lastName: "Mehta", city: "Vadodara", state: "Gujarat", pincode: "390007" },
+  { firstName: "Kavya", lastName: "Joshi", city: "Rajkot", state: "Gujarat", pincode: "360001" },
+  { firstName: "Dev", lastName: "Desai", city: "Bhavnagar", state: "Gujarat", pincode: "364001" },
+  { firstName: "Ananya", lastName: "Trivedi", city: "Gandhinagar", state: "Gujarat", pincode: "382010" },
+  { firstName: "Krish", lastName: "Rathod", city: "Junagadh", state: "Gujarat", pincode: "362001" },
+  { firstName: "Mihir", lastName: "Vyas", city: "Navsari", state: "Gujarat", pincode: "396445" },
+  { firstName: "Riya", lastName: "Bhatt", city: "Anand", state: "Gujarat", pincode: "388001" },
+  { firstName: "Dhruv", lastName: "Parikh", city: "Valsad", state: "Gujarat", pincode: "396001" },
+  { firstName: "Neha", lastName: "Pandya", city: "Mehsana", state: "Gujarat", pincode: "384002" },
+  { firstName: "Tanish", lastName: "Chaudhary", city: "Nadiad", state: "Gujarat", pincode: "387001" },
+  { firstName: "Simran", lastName: "Kapadia", city: "Bhuj", state: "Gujarat", pincode: "370001" },
+  { firstName: "Yash", lastName: "Modi", city: "Amreli", state: "Gujarat", pincode: "365601" },
+  { firstName: "Meera", lastName: "Gandhi", city: "Patan", state: "Gujarat", pincode: "384265" },
+  { firstName: "Arjun", lastName: "Acharya", city: "Vapi", state: "Gujarat", pincode: "396191" },
+  { firstName: "Nisha", lastName: "Dave", city: "Jamnagar", state: "Gujarat", pincode: "361001" },
+  { firstName: "Smit", lastName: "Bhagat", city: "Bharuch", state: "Gujarat", pincode: "392001" },
+  { firstName: "Chirag", lastName: "Gohil", city: "Porbandar", state: "Gujarat", pincode: "360575" },
+  { firstName: "Priya", lastName: "Rawal", city: "Palitana", state: "Gujarat", pincode: "364270" },
+  { firstName: "Jay", lastName: "Zaveri", city: "Godhra", state: "Gujarat", pincode: "389001" },
+  { firstName: "Tanvi", lastName: "Naik", city: "Veraval", state: "Gujarat", pincode: "362265" },
+  { firstName: "Hardik", lastName: "Purohit", city: "Surendranagar", state: "Gujarat", pincode: "363001" },
+  { firstName: "Rachit", lastName: "Soni", city: "Morbi", state: "Gujarat", pincode: "363641" },
+  { firstName: "Mitali", lastName: "Bhakta", city: "Dahod", state: "Gujarat", pincode: "389151" },
+];
+
+const seedVolunteers = async () => {
+  for (const v of volunteers) {
+    const email = `${v.firstName.toLowerCase()}.${v.lastName.toLowerCase()}@example.com`;
+    const password = `${v.firstName}@1234`;
+    const contact = "9876543210";
+
+    const data = {
+      user: {
+        email,
+        contact,
+        role: "Volunteer",
+        password,
+      },
+      volunteerProfile: {
+        firstName: v.firstName,
+        lastName: v.lastName,
+        address: `${v.city} Main Road`,
+        city: v.city,
+        state: v.state,
+        pincode: v.pincode,
+        about: `Hello, I'm ${v.firstName} ${v.lastName}, a volunteer from ${v.city}.`,
+        isAvailable: true,
+        languagePreference: "en",
+      },
+    };
+
+    try {
+      const res = await axios.post(BASE_URL, data, {
+        headers: { "Content-Type": "application/json" },
+      });
+      console.log(`✅ Registered: ${v.firstName} ${v.lastName} - ${res.data.message}`);
+    } catch (err) {
+      console.error(`❌ Failed: ${v.firstName} ${v.lastName}`, err.response?.data || err.message);
+    }
+  }
+};

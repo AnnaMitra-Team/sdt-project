@@ -7,6 +7,7 @@ const donorProfileSchema = new mongoose.Schema({
     donorSourceName: { type: String, trim: true },
     profilePicture: { type: String },
     languagePreference: { type: String, default: "en" },
+    notificationsEnabled: { type: Boolean, default: true },
     about: { type: String, maxlength: 1000 },
     address: { type: String, maxlength: 300, required: true, trim: true },
     city: { type: String, required: true, trim: true },

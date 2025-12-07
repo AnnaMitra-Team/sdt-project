@@ -58,6 +58,8 @@ const userSchema = new mongoose.Schema(
             enum: ["Donor", "NGO", "Volunteer", "Admin", "Super Admin"],
             required: true,
         },
+        resetPasswordToken: String,
+        resetPasswordExpires: Date
     },
     { timestamps: true }
 );

@@ -39,29 +39,29 @@ const foodItemSchema = Joi.object({
     unit: Joi.string().valid(...quantityUnitOptions).required(),
     type: Joi.string().valid(...foodTypeOptions).required(),
     condition: Joi.string().valid(...foodConditionOptions).required(),
-    expiryDate: Joi.date().optional(),
-    expiryTime: Joi.string().optional(),
+    expiryDate: Joi.date().optional().allow(null),
+    expiryTime: Joi.string().optional().allow(null),
     cookedDate: Joi.date().required(),
     cookedTime: Joi.string().required(),
     itemImages: Joi.array().items(Joi.string()).min(1).max(3).required()
-});
+}).unknown(true);
 
 // Main donation schema
 module.exports.donationSchema = Joi.object({
     donation: Joi.object({
-        donorId: Joi.string()
-            .custom((value, helpers) => {
+        donorId: Joi.custom((value, helpers) => {
                 if (!mongoose.Types.ObjectId.isValid(value)) {
                     return helpers.error("any.invalid");
                 }
                 return value;
             }).required(),
 
+        title: Joi.string().trim().max(100).required(),
         items: Joi.array().items(foodItemSchema).min(1).required(),
         source: Joi.string().valid(...foodSourceOptions).required(),
         items: Joi.array().items(foodItemSchema).min(1).required(),
         numberOfPeopleFed: Joi.number().min(1).required(),
-        description: Joi.string().trim().allow('').optional(),
+        description: Joi.string().trim().allow('', null).optional(),
         images: Joi.array().items(Joi.string()).min(1).max(5).required(),
         status: Joi.string().valid(...donationStatusOptions).default('New'),
         address: Joi.string().max(300).required(),
@@ -75,8 +75,7 @@ module.exports.donationSchema = Joi.object({
         contact: Joi.string().pattern(/^\d{10}$/).required(),
         email: Joi.string().email().required(),
         personName: Joi.string().required(),
-        assignedNgoId: Joi.string()
-            .custom((value, helpers) => {
+        assignedNgoId: Joi.custom((value, helpers) => {
                 if (!mongoose.Types.ObjectId.isValid(value)) {
                     return helpers.error("any.invalid");
                 }
@@ -88,7 +87,7 @@ module.exports.donationSchema = Joi.object({
         otpGeneratedAt: Joi.date().allow(null).optional(),
 
         pickedAt: Joi.date().allow(null).optional()
-    }).required()
+    }).unknown(true).required()
 });
 
 
@@ -105,7 +104,9 @@ module.exports.userSchema = Joi.object({
         // password min 8 chars, one lowercase, one uppercase, one number, one special char
         password: Joi.string().pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$')).required(),
         contact: Joi.string().pattern(/^\d{10}$/).required(),
-        role: Joi.string().valid(...userRoleOptions).required()
+        role: Joi.string().valid(...userRoleOptions).required(),
+        resetPasswordToken: Joi.string().optional(),
+        resetPasswordExpires: Joi.date().optional()
     }).unknown(true).required()
 }).unknown(true);
 
@@ -130,6 +131,7 @@ module.exports.donorProfileSchema = Joi.object({
         donorSourceName: Joi.string().trim().optional(),
         profilePicture: Joi.string().optional(),
         languagePreference: Joi.string().default("en"),
+        notificationsEnabled: Joi.boolean().default(true),
         about: Joi.string().max(1000).optional(),
         address: Joi.string().max(300).trim().required(),
         city: Joi.string().trim().required(),
@@ -175,6 +177,7 @@ module.exports.ngoProfileSchema = Joi.object({
         registeredUnder: Joi.string().trim().required(),
         profilePicture: Joi.string().optional(),
         languagePreference: Joi.string().default("en"),
+        notificationsEnabled: Joi.boolean().default(true),
         bannerPicture: Joi.string().optional(),
         website: Joi.string().uri().optional(),
         address: Joi.string().max(300).trim().required(),
@@ -247,6 +250,7 @@ module.exports.volunteerProfileSchema = Joi.object({
         lastName: Joi.string().trim().required(),
         profilePicture: Joi.string().optional(),
         languagePreference: Joi.string().default("en"),
+        notificationsEnabled: Joi.boolean().default(true),
         isAvailable: Joi.boolean().default(true),
         about: Joi.string().max(1000).optional(),
         address: Joi.string().max(300).trim().required(),

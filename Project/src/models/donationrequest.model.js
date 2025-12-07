@@ -23,7 +23,7 @@ const donationRequestSchema = new mongoose.Schema({
     timestamps: true // adds createdAt and updatedAt
 });
 
-donationRequestSchema.index({ donationId: 1, ngoId: 1 }, { unique: true });
+// donationRequestSchema.index({ donationId: 1, ngoId: 1 }, { unique: true });
 
 const DonationRequest = mongoose.model('DonationRequest', donationRequestSchema);
 module.exports = DonationRequest;

@@ -18,13 +18,18 @@ const upload = multer({ storage });
 // Route for logout
 router.get('/logout', authMiddleware.isLoggedIn, authController.logoutUser);
 
+// Handle change password form submission from accout page
+router.post('/change-password', authMiddleware.isLoggedIn, authController.handleChangePassword);
+
+
 router.use(authMiddleware.isLoggedOut);
 
 // Route for the login page
 router.get('/login', authController.renderLoginPage);
 
 // Handle login form submission
-router.post('/login', passport.authenticate('local', { failureRedirect: '/auth/login', failureMessage: true }), authController.loginUser);
+// router.post('/login', passport.authenticate('local', { failureRedirect: '/auth/login', failureMessage: true }), authController.loginUser);
+router.post('/login', authController.loginUser);
 
 // Route for the register page
 router.get('/register', authController.renderRegisterPage);
@@ -34,6 +39,15 @@ router.post('/register', upload.any(), authMiddleware.validateRegistrationData, 
 
 // Route for the forgot password page
 router.get('/forgot-password', authController.renderForgotPasswordPage);
+
+// Handle forgot password form submission
+router.post('/forgot-password', authController.handleForgotPassword);
+
+// Route for the reset password page
+router.get('/reset-password/:token', authController.renderResetPasswordPage);
+
+// Handle reset password form submission
+router.post('/reset-password/:token', authController.handleResetPassword);
 
 
 module.exports = router;

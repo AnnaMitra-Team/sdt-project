@@ -57,6 +57,14 @@ module.exports.isVolunteer = (req, res, next) => {
     next();
 }
 
+// Middleware to check if user is not Admin or Super Admin
+module.exports.isNotAdminOrSuperAdmin = (req, res, next) => {
+    if (req.user && (req.user.role === 'Admin' || req.user.role === 'Super Admin')) {
+        return res.redirect('/');
+    }
+    next();
+}
+
 // Middleware to validate registration data
 module.exports.validateRegistrationData = async (req, res, next) => {
     try {
@@ -71,7 +79,12 @@ module.exports.validateRegistrationData = async (req, res, next) => {
             if (!req.body.ngoProfile) {
                 return res.status(400).send({ success: false, message: 'NGO profile data is required' });
             }
+
+            // Handle file uploads / get document file paths
             const ngoDocuments = [];
+            if (!req.files || req.files.length === 0) {
+                return res.status(400).send({ success: false, message: 'NGO documents are required' });
+            }
             req.files.forEach(file => {
                 const { fieldname, path } = file;
 
@@ -81,6 +94,7 @@ module.exports.validateRegistrationData = async (req, res, next) => {
                 }
             });
             req.body.ngoProfile.documents = ngoDocuments;
+            
             console.log('Validating NGO Profile Schema');
             await joiSchemas.ngoProfileSchema.validateAsync(req.body);
         } else if (user.role === 'Volunteer') {

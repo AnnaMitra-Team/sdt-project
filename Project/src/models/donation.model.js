@@ -110,7 +110,7 @@ const donationSchema = new mongoose.Schema({
 
     personName: { type: String, required: true },
 
-    assignedNgoId: { type: mongoose.Schema.Types.ObjectId, ref: 'NGO', default: null },
+    assignedNgoId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
     
     // OTP fields for pickup verification
     otp: { type: String, default: null },
@@ -118,7 +118,10 @@ const donationSchema = new mongoose.Schema({
     otpGeneratedAt: { type: Date, default: null },
     
     // Pickup tracking
-    pickedAt: { type: Date, default: null }
+    pickedAt: { type: Date, default: null },
+
+    // Completion tracking
+    completedAt: { type: Date, default: null }
 }, {
     timestamps: true // adds createdAt and updatedAt
 });

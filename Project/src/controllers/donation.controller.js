@@ -1,13 +1,17 @@
-
 const e = require('express');
 const fs = require('fs');
 const Donation = require('../models/donation.model');
 const DonationRequest = require('../models/donationrequest.model');
+const DonationTeam = require('../models/donationteam.model');
+const NGOProfile = require('../models/ngoprofile.model');
+const VolunteerProfile = require('../models/volunteerprofile.model');
+const Notification = require('../models/notification.model');
 const userController = require('./user.controller');
 const mongoose = require('mongoose');
 const safeRender = require('../utils/safeRender');
 const catchAsync = require('../utils/catchAsync');
 
+const { deleteFiles } = require('../helpers/donation.helpers'); // Import the new helpers
 
 // Render the donation form
 module.exports.renderDonationForm = (req, res, next) => {
@@ -20,55 +24,7 @@ module.exports.renderDonationForm = (req, res, next) => {
 }
 
 // Handle the donation form submission
-module.exports.submitDonationForm = catchAsync(async (req, res) => {
-
-    let donationImages = [];
-    let foodItemsMap = [];
-    let donorID = null;
-    const formFields = req.body;
-
-    if(formFields.description === 'null' || formFields.description === '') {
-        formFields.description = null;
-    }
-
-    donorID = await userController.findOneUserId('Donor');
-
-    const {
-        title,
-        source,
-        numberOfPeopleFed,
-        description,
-        address,
-        city,
-        state,
-        pincode = '362001',
-        latitude,
-        longitude,
-        personName,
-        contact,
-        email
-    } = formFields;
-
-    const donationData = {
-        donorId: donorID,
-        title,
-        source,
-        items: foodItemsMap,
-        numberOfPeopleFed: parseInt(numberOfPeopleFed),
-        description,
-        images: donationImages,
-        address,
-        city,
-        state,
-        pincode,
-        location: {
-            longitude,
-            latitude
-        },
-        personName,
-        contact,
-        email
-    };
+module.exports.submitDonationForm = catchAsync(async (req, res, next) => {
 
     if (mongoose.connection.readyState !== 1) {
         console.error('Database connection is not ready');
@@ -76,56 +32,30 @@ module.exports.submitDonationForm = catchAsync(async (req, res) => {
     }
 
     try {
-        for(let itemIndex in formFields.foodItems) {
-            tempItem = formFields.foodItems[itemIndex];
-            if( !tempItem.name && !tempItem.quantity && !tempItem.unit && !tempItem.type && !tempItem.condition && !tempItem.cookedDate && !tempItem.cookedTime) {
-                continue;
-            }
-            if( tempItem.expiryDate === 'null' || tempItem.expiryDate === '') {
-                tempItem.expiryDate = null;
-            }
-            if( tempItem.expiryTime === 'null' || tempItem.expiryTime === '') {
-                tempItem.expiryTime = null;
-            }
-            console.log('food item found', tempItem);
-            let item = {
-                name: tempItem.name,
-                quantity: parseInt(tempItem.quantity),
-                unit: tempItem.unit,
-                type: tempItem.type,
-                condition: tempItem.condition,
-                cookedDate: tempItem.cookedDate,
-                cookedTime: tempItem.cookedTime,
-                expiryDate: tempItem.expiryDate,
-                expiryTime: tempItem.expiryTime,
-            }
-            foodItemsMap.push(item);
-        }
-
-        // Handle file uploads / get image file paths
-        req.files.forEach(file => {
-            const { fieldname, path } = file;
-
-            // Store donation images
-            if (fieldname.startsWith('images')) {
-                donationImages.push('/' + path.replace(/\\/g, '/').split('public/')[1]);
-            }
-
-            // Store food item images
-            const match = fieldname.match(/^foodItems\[(\d+)]\[itemImages]\[(\d+)]$/);
-            if (match) {
-                const index = match[1];
-                if (!foodItemsMap[index].itemImages) foodItemsMap[index].itemImages = [];
-                // if (!foodItemsMap[index].itemImages) foodItemsMap[index].itemImages = [];
-                foodItemsMap[index].itemImages.push('/' + path.replace(/\\/g, '/').split('public/')[1]);
-            }
-        });
-
         console.log('-----------------------------------------');
-        console.log(donationData, 'donationData printed');
+        // console.log('Donation:', req.donation);
 
-        const donation = new Donation(donationData);
+        const donation = new Donation(req.donation);
         await donation.save();
+
+        // Notify NGOs in the same city as donation
+        try {
+            if (donation.city) {
+                const ngos = await NGOProfile.find({ city: donation.city }).select('userId organizationName').lean();
+                if (ngos && ngos.length) {
+                    const notifications = ngos.map(ngo => ({
+                        userId: ngo.userId,
+                        title: 'New donation in your city',
+                        message: `A new donation "${donation.title || ''}" is available in ${donation.city}. Click to view.`,
+                        type: 'info',
+                        redirectUrl: `/donations/${donation._id}`
+                    }));
+                    await Notification.insertManyIfAllowed(notifications);
+                }
+            }
+        } catch (notifyErr) {
+            console.error('Error creating notifications for NGOs:', notifyErr);
+        }
 
         return res.status(201).json({
             success: true,
@@ -164,23 +94,87 @@ module.exports.viewDonationDetails = catchAsync(async (req, res, next) => {
             }, next);
         }
 
-        const ngoId = await userController.findOneUserId('NGO');
+        // check if logged in user is donor of this donation
+        const isDonor = req.user && donation.donorId._id.equals(req.user._id);
 
         // Fetch donation requests for this donation with status 'New'
-        const DonationRequest = require('../models/donationrequest.model');
         const donationRequests = await DonationRequest.find({ 
             donationId: donationId, 
             status: 'New' 
-        }).populate('ngoId', 'firstName lastName email contact');
+        }).populate('ngoId', 'contact').sort({ requestDate: -1 });
+
+        const enrichedRequests = await Promise.all(
+            donationRequests.map(async (reqItem) => {
+                const ngoProfile = await NGOProfile.findOne({ userId: reqItem.ngoId._id }).lean();
+
+                return {
+                    _id: reqItem._id,
+                    message: reqItem.message,
+                    requestDate: reqItem.requestDate,
+
+                    ngo: {
+                        name: ngoProfile?.organizationName || "Unknown NGO",
+                        profilePicture: ngoProfile?.profilePicture || null,
+                        contact: reqItem.ngoId.contact
+                    }
+                };
+            })
+        );
+
+        // Check if logged in NGO has already requested this donation
+        let isRequested = false;
+        if (req.user && req.user.role === 'NGO') {
+            const existingRequest = await DonationRequest.findOne({ 
+                donationId: donationId,
+                ngoId: req.user._id,
+                status: 'New'
+            });
+            isRequested = existingRequest ? true : false;
+        }
+
+        // Find available volunteers of loggedin NGO for scheduling pickup (for NGOs)
+        let availableVolunteers = [];
+        if (req.user && req.user.role === 'NGO') {
+            availableVolunteers = await VolunteerProfile.find({
+                joinedNGOs: req.user._id,
+                isAvailable: true
+            }).select('userId firstName lastName');
+        }
+
+        // find donation schedule if scheduled
+        if (donation.status === 'Scheduled') {
+            const donationTeam = await DonationTeam.findOne({ donationId: donation._id });
+            if (donationTeam) {
+                donation.pickupSchedule = donationTeam.pickupSchedule;
+                donation.deliverySchedule = donationTeam.deliverySchedule;
+            }
+        }
+
+        // Check if logged in volunteer is leader of the donation team for this donation
+        let isLeader = false;
+        if (req.user && req.user.role === 'Volunteer') {
+            const donationTeam = await DonationTeam.findOne({
+                donationId: donation._id,
+                leaderId: req.user._id
+            });
+            isLeader = donationTeam ? true : false;
+        }
+        
+        // Find completion images from donation teams 
+        let donationTeam = await DonationTeam.findOne({ donationId: donation._id }).select('completionProof');
 
         return safeRender(res, 'donations/show', {
-            activePage: 'donate',
+            activePage: 'donation-details',
             pageTitle: `${donation.title} | AnnaMitra`,
             messageType: null,
             message: null,
-            ngoId,
             donation,
-            donationRequests
+            isDonor,
+            isRequested,
+            isLeader,
+            donationRequests: enrichedRequests,
+            availableVolunteers,
+            donationTeam
         }, next);
     } catch (error) {
         console.error('Error fetching donation details:', error);
@@ -219,6 +213,16 @@ module.exports.renderEditDonationForm = catchAsync(async (req, res, next) => {
             }, next);
         }
 
+        // Ensure that only the donor who created the donation can edit it
+        if (!donation.donorId._id.equals(req.user._id)) {
+            return safeRender(res, '404', {
+                activePage: '404',
+                pageTitle: 'Unauthorized | AnnaMitra',
+                messageType: 'danger',
+                message: 'You are not authorized to edit this donation.'
+            }, next);
+        }
+
         console.log('Donation found for edit:', donation);
         return safeRender(res, 'donations/edit', {
             activePage: 'edit-donation',
@@ -239,177 +243,40 @@ module.exports.renderEditDonationForm = catchAsync(async (req, res, next) => {
     }
 })
 
-// Handle edit donation form submission
 module.exports.submitEditDonationForm = catchAsync(async (req, res) => {
-
-    let donationImages = [];
-    let foodItemsMap = [];
-    let oldImages = [];
-    const formFields = req.body;
-
-    if(formFields.description === 'null' || formFields.description === '') {
-        formFields.description = null;
-    }
-
-    const {
-        donationId,
-        title,
-        source,
-        numberOfPeopleFed,
-        description,
-        address,
-        city,
-        state,
-        pincode = '362001',
-        latitude,
-        longitude,
-        personName,
-        contact,
-        email
-    } = formFields;
-
-    const donationData = {
-        title,
-        source,
-        items: foodItemsMap,
-        numberOfPeopleFed: parseInt(numberOfPeopleFed),
-        description,
-        images: donationImages,
-        address,
-        city,
-        state,
-        pincode,
-        location: {
-            longitude,
-            latitude
-        },
-        personName,
-        contact,
-        email
-    };
+    // return res.status(400).json({success: false, message: 'failll'});
 
     if (mongoose.connection.readyState !== 1) {
         console.error('Database connection is not ready');
-        return res.json({ success: false, message: 'Database connection error! Faild to update donation.' });
+        return res.json({ success: false, message: 'Database connection error! Faild to upload donation.' });
     }
 
-    console.log('-----------------------------------------');
-    console.log(formFields, 'formFields printed');
-    console.log('-----------------------------------------');
-
     try {
-        // Collect food items from form fields
-        for(let itemIndex in formFields.foodItems) {
-            let tempItem = formFields.foodItems[itemIndex];
-            if( !tempItem.name && !tempItem.quantity && !tempItem.unit && !tempItem.type && !tempItem.condition && !tempItem.cookedDate && !tempItem.cookedTime) {
-                continue;
-            }
-            if( tempItem.expiryDate === 'null' || tempItem.expiryDate === '') {
-                tempItem.expiryDate = null;
-            }
-            if( tempItem.expiryTime === 'null' || tempItem.expiryTime === '') {
-                tempItem.expiryTime = null;
-            }
-            console.log('food item found', tempItem);
-            let item = {
-                name: tempItem.name,
-                quantity: parseInt(tempItem.quantity),
-                unit: tempItem.unit,
-                type: tempItem.type,
-                condition: tempItem.condition,
-                itemImages: tempItem.itemImages || [],
-                cookedDate: tempItem.cookedDate,
-                cookedTime: tempItem.cookedTime,
-                expiryDate: tempItem.expiryDate,
-                expiryTime: tempItem.expiryTime,
-            }
-            foodItemsMap.push(item);
+        const { donation, oldImages } = req;
+        const donationId = req.params.id;
 
-            // Collect old item images if they exist
-            if (tempItem.oldItemImages && tempItem.oldItemImages.length > 0) {
-                oldImages.push(...tempItem.oldItemImages);
-            }
-        }
-
-        // Handle file uploads / get image file paths
-        req.files.forEach(file => {
-            const { fieldname, path } = file;
-
-            // Store donation images
-            if (fieldname.startsWith('images')) {
-                donationImages.push('/' + path.replace(/\\/g, '/').split('public/')[1]);
-            }
-
-            // Store food item images
-            const match = fieldname.match(/^foodItems\[(\d+)]\[itemImages]\[(\d+)]$/);
-            if (match) {
-                const index = match[1];
-                if (!foodItemsMap[index].itemImages) foodItemsMap[index].itemImages = [];
-                // if (!foodItemsMap[index].itemImages) foodItemsMap[index].itemImages = [];
-                foodItemsMap[index].itemImages.push('/' + path.replace(/\\/g, '/').split('public/')[1]);
-            }
-        });
-
-        // If no new images are uploaded, use old images | and if found, collect old images
-        if(donationImages.length === 0) {
-            formFields.donationImages.forEach((image, i) => {
-                if (image) {
-                    donationImages.push(image);
-                }
-            });
-        }
-        else {
-            oldImages.push(...formFields.oldDonationImages);
-        }
-
-        console.log('-----------------------------------------');
-        console.log(donationData, 'donationData printed');
-        console.log('-----------------------------------------\n\n');
-        foodItemsMap.forEach((item, index) => {
-            console.log(item['itemImages']);
-        });
-        console.log('-----------------------------------------\n\n');
-        console.log(oldImages, 'oldImages printed');
-        console.log('-----------------------------------------\n\n');
-
-        // Delete old images if they exist
-        if (oldImages.length > 0) {
-            oldImages.forEach(image => {
-                console.log(`Deleting old image: ${image}`);
-                // first check if the image exists in /images/donations directory
-                const imagePath = 'public/' + image.replace(/^\//, '');
-                if (fs.existsSync(imagePath)) {
-                    fs.unlinkSync(imagePath);
-                    console.log(`Deleted old image: ${image}`);
-                } else {
-                    console.warn(`Old image not found, skipping deletion: ${image}`);
-                }
-            });
-        }
-
-        // Validate donationId
         if (!mongoose.Types.ObjectId.isValid(donationId)) {
             return res.status(400).json({ success: false, message: 'Invalid donation ID.' });
         }
 
-        // Now update the donation in the database
-        const donation = await Donation.findByIdAndUpdate(donationId, donationData, { new: true });
-        if (!donation) {
+        const newDonation = await Donation.findByIdAndUpdate(donationId, donation, { new: true });
+
+        if (!newDonation) {
             return res.status(404).json({ success: false, message: 'Donation not found! Failed to update.' });
         }
 
-        console.log('\n\n\nDonation updated successfully:', donation);
+        deleteFiles(oldImages);
 
-        return res.status(201).json({
+        return res.status(200).json({
             success: true,
-            message: 'Donation created successfully.',
-            donationId: donation._id
+            message: 'Donation updated successfully.',
+            donationId: newDonation._id
         });
     } catch (error) {
-        console.error('Error creating donation:', error);
-        return res.status(500).json({ success: false, message: 'Server error while saving donation.' });
+        console.error('Error updating donation:', error);
+        return res.status(500).json({ success: false, message: 'Server error while updating donation.' });
     }
-})
+});
 
 // Delete a donation
 module.exports.deleteDonation = catchAsync(async (req, res) => {
@@ -419,7 +286,13 @@ module.exports.deleteDonation = catchAsync(async (req, res) => {
         return res.status(400).json({ success: false, message: 'Invalid donation ID.' });
     }
 
+    if (mongoose.connection.readyState !== 1) {
+        console.error('Database connection is not ready');
+        return res.json({ success: false, message: 'Database connection error! Faild to upload donation.' });
+    }
+
     try {
+        console.log('Deleting donation with ID:', donationId);
         const donation = await Donation.findByIdAndDelete(donationId);
         if (!donation) {
             return res.status(404).json({ success: false, message: 'Donation not found.' });
@@ -473,12 +346,14 @@ module.exports.listDonations = catchAsync(async (req, res, next) => {
 // Add to src/controllers/donation.controller.js
 
 // Handle donation request
-module.exports.handleDonationRequest = catchAsync(async (req, res) => {
-    const { donationId, donorId, ngoId, message } = req.body;
-    
+module.exports.handleDonationRequest = catchAsync(async (req, res) => {  
+    console.log('Handling donation request:', req.body);  
     try {
+        const { donationId, donorId, message } = req.body;
+        const ngoId = req.user._id; 
+
         // Check if a request from this ngoId for this donationId already exists
-        const existingRequest = await DonationRequest.findOne({ donationId, ngoId });
+        const existingRequest = await DonationRequest.findOne({ donationId, ngoId, status: 'New' });
         if (existingRequest) {
             return res.json({ success: false, message: 'You have already requested this donation.' });
         }
@@ -490,6 +365,24 @@ module.exports.handleDonationRequest = catchAsync(async (req, res) => {
         });
         
         await request.save();
+
+        // Notify donor that an NGO requested their donation
+        try {
+            const donationDoc = await Donation.findById(donationId).select('donorId title');
+            const donorUserId = donationDoc?.donorId;
+            if (donorUserId) {
+                await Notification.createIfAllowed({
+                    userId: donorUserId,
+                    title: 'New request for your donation',
+                    message: `An NGO has requested your donation "${donationDoc.title || ''}". Review the request.`,
+                    type: 'info',
+                    redirectUrl: `/donations/${donationId}`
+                });
+            }
+        } catch (notifyErr) {
+            console.error('Error creating notification for donor on request:', notifyErr);
+        }
+        
         res.json({ success: true, message: 'Request sent successfully' });
     } catch (error) {
         if (error.code === 11000) {
@@ -505,13 +398,37 @@ module.exports.approveRequest = catchAsync(async (req, res) => {
     const { requestId } = req.params;
     
     try {
-        const request = await DonationRequest.findByIdAndUpdate(requestId, {
-            status: 'Accepted',
-            respondedAt: new Date()
-        });
+        const request = await DonationRequest.findById(requestId);
+
+        // check if logged in donor owns the donation for this request
+        if (request.user && !request.donorId.equals(req.user._id)) {
+            return res.status(403).json({ success: false, message: 'You are not authorized to approve this request.' });
+        }
+        
+        request.status = 'Accepted';
+        request.respondedAt = new Date();
+        await request.save();
         
         // Update donation status to 'Assigned'
-        await Donation.findByIdAndUpdate(request.donationId, { status: 'Assigned', assignedNgoId: request.ngoId });
+        const approvedDonation = await Donation.findByIdAndUpdate(request.donationId, { status: 'Assigned', assignedNgoId: request.ngoId });
+
+        // Add donation id to ngo's donationsHandled
+        const ngoProfile = await NGOProfile.findOne({ userId: request.ngoId });
+        ngoProfile.donationsHandled.push(request.donationId);
+        await ngoProfile.save();
+
+        // Notify the NGO that their request was approved
+        try {
+            await Notification.createIfAllowed({
+                userId: request.ngoId,
+                title: 'Donation request approved',
+                message: `Your request for donation ${approvedDonation.title || ''} has been approved.`,
+                type: 'success',
+                redirectUrl: `/donations/${approvedDonation._id}`
+            });
+        } catch (notifyErr) {
+            console.error('Error notifying NGO about approval:', notifyErr);
+        }
         
         res.json({ success: true, message: 'Request approved' });
     } catch (error) {
@@ -524,10 +441,27 @@ module.exports.rejectRequest = catchAsync(async (req, res) => {
     const { requestId } = req.params;
     
     try {
-        await DonationRequest.findByIdAndUpdate(requestId, {
+        const reqDoc = await DonationRequest.findByIdAndUpdate(requestId, {
             status: 'Rejected',
             respondedAt: new Date()
-        });
+        }, { new: true });
+
+        const donation = await Donation.findById(reqDoc.donationId).select('title');
+
+        // Notify the NGO that their request was rejected
+        try {
+            if (reqDoc) {
+                await Notification.createIfAllowed({
+                    userId: reqDoc.ngoId,
+                    title: 'Donation request rejected',
+                    message: `Your request for donation ${donation.title} was rejected by the donor.`,
+                    type: 'danger',
+                    redirectUrl: `/donations/${reqDoc.donationId}`
+                });
+            }
+        } catch (notifyErr) {
+            console.error('Error notifying NGO about rejection:', notifyErr);
+        }
         
         res.json({ success: true, message: 'Request rejected' });
     } catch (error) {
@@ -546,7 +480,7 @@ module.exports.cancelDonationPickup = catchAsync(async (req, res) => {
             return res.status(404).json({ success: false, message: 'Donation not found' });
         }
         
-        if (donation.status !== 'Assigned') {
+        if (donation.status === 'New') {
             return res.status(400).json({ success: false, message: 'Donation is not currently assigned' });
         }
         
@@ -555,7 +489,6 @@ module.exports.cancelDonationPickup = catchAsync(async (req, res) => {
         }
         
         // Mark the donation request from the assigned NGO as rejected
-        const DonationRequest = require('../models/donationrequest.model');
         await DonationRequest.findOneAndUpdate(
             { 
                 donationId: id, 
@@ -573,6 +506,17 @@ module.exports.cancelDonationPickup = catchAsync(async (req, res) => {
             status: 'New',
             assignedNgoId: null
         });
+
+        // Make all volunteers of any existing donation team available again
+        const donationTeam = await DonationTeam.findOne({ donationId: id });
+        if (donationTeam) {
+            await VolunteerProfile.updateMany(
+                { userId: { $in: donationTeam.volunteers } },
+                { isAvailable: true }
+            );
+            // Optionally, you might want to delete the donation team as well
+            await DonationTeam.deleteOne({ donationId: id });
+        }
         
         res.json({ 
             success: true, 
@@ -585,6 +529,254 @@ module.exports.cancelDonationPickup = catchAsync(async (req, res) => {
     }
 });
 
+// Schedule Donation Pickup
+module.exports.schedulePickup = catchAsync(async (req, res) => {
+    const { id } = req.params; // donation ID
+    const ngoId = req.user._id; // logged-in NGO user ID
+
+    const {
+        pickupSchedule,
+        deliverySchedule,
+        volunteers,
+        leaderId
+    } = req.body;
+
+    // 1. BASIC VALIDATION
+    if (!pickupSchedule?.date || !pickupSchedule?.time) {
+        return res.status(400).json({
+            success: false,
+            message: "Pickup date and time are required."
+        });
+    }
+
+    if (!volunteers || !Array.isArray(volunteers) || volunteers.length < 2) {
+        return res.status(400).json({
+            success: false,
+            message: "At least two volunteer must be selected."
+        });
+    }
+
+    // 2. FETCH DONATION
+    const donation = await Donation.findById(id);
+
+    if (!donation) {
+        return res.status(404).json({
+            success: false,
+            message: "Donation not found."
+        });
+    }
+
+    // 3. ENSURE NGO OWNS THIS DONATION
+    if (!donation.assignedNgoId || donation.assignedNgoId.toString() !== ngoId.toString()) {
+        return res.status(403).json({
+            success: false,
+            message: "Unauthorized to schedule this donation."
+        });
+    }
+
+    // 4. ENSURE VALID DONATION STATUS
+    if (donation.status !== "Assigned") {
+        return res.status(400).json({
+            success: false,
+            message: "This donation cannot be scheduled at this stage."
+        });
+    }
+
+    // 5. ENSURE VOLUNTEERS ARE VALID & AVAILABLE
+    const volunteerProfiles = await VolunteerProfile.find({
+        userId: { $in: volunteers },
+        isAvailable: true
+    });
+
+    if (volunteerProfiles.length !== volunteers.length) {
+        return res.status(400).json({
+            success: false,
+            message: "One or more selected volunteers are not available."
+        });
+    }
+
+    // 6. ENSURE NONE OF THEM IS ALREADY IN AN ACTIVE TEAM
+    for (let volId of volunteers) {
+        const isAlreadyAssigned = await DonationTeam.exists({
+            volunteers: volId,
+            completionProof: { $size: 0 } // active team
+        });
+
+        if (isAlreadyAssigned) {
+            return res.status(400).json({
+                success: false,
+                message: "One or more volunteers are already assigned to another donation."
+            });
+        }
+    }
+
+    // 7. VALIDATE LEADER (IF PROVIDED)
+    if (leaderId && !volunteers.includes(leaderId)) {
+        return res.status(400).json({
+            success: false,
+            message: "Leader must be selected from chosen volunteers."
+        });
+    }
+
+    // 8. CREATE DONATION TEAM
+    const donationTeam = new DonationTeam({
+        donationId: donation._id,
+        ngoId,
+        pickupSchedule: {
+            date: pickupSchedule.date,
+            time: pickupSchedule.time
+        },
+        deliverySchedule: {
+            date: deliverySchedule?.date || null,
+            time: deliverySchedule?.time || null,
+            location: deliverySchedule?.location || ""
+        },
+        volunteers,
+        leaderId: leaderId || null
+    });
+
+    await donationTeam.save();
+
+    // 9. UPDATE DONATION STATUS → SCHEDULED
+    donation.status = "Scheduled";
+    await donation.save();
+
+    // 10. LOCK ALL SELECTED VOLUNTEERS
+    await VolunteerProfile.updateMany(
+        { userId: { $in: volunteers } },
+        { isAvailable: false }
+    );
+
+    // Notify donor and volunteers about scheduling
+    try {
+        // notify donor
+        if (donation.donorId) {
+            await Notification.createIfAllowed({
+                userId: donation.donorId,
+                title: 'Pickup scheduled for your donation',
+                message: `Pickup for "${donation.title || ''}" is scheduled on ${pickupSchedule.date} at ${pickupSchedule.time}.`,
+                type: 'info',
+                redirectUrl: `/donations/${donation._id}`
+            });
+        }
+
+        // notify volunteers (bulk)
+        if (Array.isArray(volunteers) && volunteers.length) {
+            const volNotifications = volunteers.map(vId => ({
+                userId: vId,
+                title: 'You have been assigned to a pickup',
+                message: `You are assigned for pickup of donation "${donation.title || ''}" on ${pickupSchedule.date} at ${pickupSchedule.time}.`,
+                type: 'info',
+                redirectUrl: `/donations/${donation._id}`
+            }));
+            await Notification.insertManyIfAllowed(volNotifications);
+        }
+
+        // notify leader with a distinct message
+        if (leaderId) {
+            await Notification.createIfAllowed({
+                userId: leaderId,
+                title: 'You are the leader for an upcoming pickup',
+                message: `You are assigned as leader for pickup of "${donation.title || ''}" on ${pickupSchedule.date} at ${pickupSchedule.time}.`,
+                type: 'info',
+                redirectUrl: `/donations/${donation._id}`
+            });
+        }
+    } catch (notifyErr) {
+        console.error('Error creating schedule notifications:', notifyErr);
+    }
+
+    // 11. SUCCESS RESPONSE
+    res.status(201).json({
+        success: true,
+        message: "Pickup scheduled successfully.",
+        donationTeam
+    });
+});
+
+
+// Mark Donation as Completed
+module.exports.markDonationCompleted = catchAsync(async (req, res) => {
+    const { id } = req.params; // donation ID
+
+    // 1. ENSURE FILES EXIST
+    if (!req.files || req.files.length > 10) {
+        return res.status(400).json({
+            success: false,
+            message: "Maximum 10 completion images are required."
+        });
+    }
+
+    // 2. FIND DONATION TEAM
+    const donationTeam = await DonationTeam.findOne({
+        donationId: id
+    });
+
+    if (!donationTeam) {
+        return res.status(404).json({
+            success: false,
+            message: "Donation team not found."
+        });
+    }
+
+    // 3. SAVE IMAGE PATHS
+    const imageUrls = req.files.map(file => {
+        let imgPath = file.path.replace(/\\/g, '/');
+
+        if (imgPath.includes('public/')) {
+            imgPath = '/' + imgPath.split('public/')[1];
+        } else {
+            imgPath = '/' + imgPath;
+        }
+
+        return imgPath;
+    });
+    donationTeam.completionProof = imageUrls;
+    await donationTeam.save();
+
+    // 4. UPDATE DONATION STATUS → COMPLETED
+    const donation = await Donation.findById(id);
+
+    if (!donation) {
+        return res.status(404).json({
+            success: false,
+            message: "Donation not found."
+        });
+    }
+
+    donation.status = "Completed";
+    donation.completedAt = new Date();
+    await donation.save();
+
+    // 5. UNLOCK ALL VOLUNTEERS
+    await VolunteerProfile.updateMany(
+        { userId: { $in: donationTeam.volunteers } },
+        { isAvailable: true }
+    );
+
+    // Notify donor that donation is completed
+    try {
+        if (donation.donorId) {
+            await Notification.createIfAllowed({
+                userId: donation.donorId,
+                title: 'Donation completed',
+                message: `Your donation "${donation.title || ''}" has been marked as completed. Click to rate the NGO. Thank you!`,
+                type: 'success',
+                redirectUrl: `/donations/${donation._id}`
+            });
+        }
+    } catch (notifyErr) {
+        console.error('Error notifying donor about completion:', notifyErr);
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Donation marked as completed successfully."
+    });
+});
+
+
+
 // Generate and send OTP to donor
 module.exports.sendOTP = catchAsync(async (req, res) => {
     const { id } = req.params; // donation ID
@@ -596,8 +788,8 @@ module.exports.sendOTP = catchAsync(async (req, res) => {
             return res.status(404).json({ success: false, message: 'Donation not found' });
         }
         
-        if (donation.status !== 'Assigned') {
-            return res.status(400).json({ success: false, message: 'Donation is not currently assigned' });
+        if (donation.status !== 'Scheduled') {
+            return res.status(400).json({ success: false, message: 'Donation is not currently scheduled' });
         }
         
         // Generate 6-digit OTP
@@ -612,10 +804,22 @@ module.exports.sendOTP = catchAsync(async (req, res) => {
         
         // In a real application, you would send SMS here
         // For now, we'll just log it and return success
-        console.log(`OTP ${otp} sent to donor ${donation.donorId.contact} for donation ${id}`);
+        console.log(`OTP ${otp} sent to donor ${donation.donorId.contact} for donation ${donation.title}`);
         
-        // TODO: Integrate with SMS service (Twilio, etc.)
-        // await sendSMS(donation.donorId.contact, `Your OTP for donation pickup is: ${otp}`);
+        // Create notification for donor with OTP (for testing; remove OTP in production)
+        try {
+            if (donation.donorId) {
+                await Notification.createIfAllowed({
+                    userId: donation.donorId._id ? donation.donorId._id : donation.donorId,
+                    title: 'OTP for donation pickup',
+                    message: `Your OTP for donation ${donation.title} pickup is: ${otp}. It expires in 10 minutes.`,
+                    type: 'info',
+                    redirectUrl: `/donations/${id}`
+                });
+            }
+        } catch (notifyErr) {
+            console.error('Error notifying donor with OTP:', notifyErr);
+        }
         
         res.json({ 
             success: true, 
@@ -629,6 +833,7 @@ module.exports.sendOTP = catchAsync(async (req, res) => {
     }
 });
 
+
 // Verify OTP and mark donation as picked
 module.exports.verifyOTP = catchAsync(async (req, res) => {
     const { id } = req.params; // donation ID
@@ -641,8 +846,8 @@ module.exports.verifyOTP = catchAsync(async (req, res) => {
             return res.status(404).json({ success: false, message: 'Donation not found' });
         }
         
-        if (donation.status !== 'Assigned') {
-            return res.status(400).json({ success: false, message: 'Donation is not currently assigned' });
+        if (donation.status !== 'Scheduled') {
+            return res.status(400).json({ success: false, message: 'Donation is not currently scheduled' });
         }
         
         // Check if OTP exists and is valid
@@ -668,20 +873,21 @@ module.exports.verifyOTP = catchAsync(async (req, res) => {
             otpExpiry: null,
             otpGeneratedAt: null
         });
-        
-        // Update the donation request status to 'Completed'
-        const DonationRequest = require('../models/donationrequest.model');
-        await DonationRequest.findOneAndUpdate(
-            { 
-                donationId: id, 
-                ngoId: donation.assignedNgoId,
-                status: 'Accepted'
-            },
-            { 
-                status: 'Completed',
-                completedAt: new Date()
+
+        // Notify donor that pickup was verified / marked as picked
+        try {
+            if (donation.donorId) {
+                await Notification.createIfAllowed({
+                    userId: donation.donorId,
+                    title: 'Donation picked up',
+                    message: `Pickup verified for your donation "${donation.title || ''}".`,
+                    type: 'success',
+                    redirectUrl: `/donations/${id}`
+                });
             }
-        );
+        } catch (notifyErr) {
+            console.error('Error notifying donor after OTP verify:', notifyErr);
+        }
         
         res.json({ 
             success: true, 
