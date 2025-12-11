@@ -4,7 +4,7 @@
   "description": "This is an real time solution of food wastage by donating it to the needy people with the help of NGOs.",
   "main": "index.js",
   "scripts": {
-    "test": "npx mocha src/test/**/*.test.js",
+    "test": "node node_modules/mocha/bin/mocha.js src/test/**/*.test.js",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
